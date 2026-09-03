@@ -3,443 +3,505 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Centro de Manuales Corporativos</title>
+  <title>Sistema de Gestión de Manuales Corporativos</title>
+  <!-- Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com"></script>
+  <!-- FontAwesome Icons -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <!-- Mammoth JS (Convertidor avanzado de DOCX a HTML con soporte de imágenes Base64) -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.6.0/mammoth.browser.min.js"></script>
-  <script>
-    tailwind.config = {
-      theme: {
-        extend: {
-          colors: {
-            brand: { navy: '#0B192C', dark: '#1E3E62', primary: '#005B94', bgLight: '#F4F6F9', border: '#E2E8F0' }
-          }
-        }
-      }
-    }
-  </script>
+  
+  <style>
+    /* Estilos para el documento extraído del Word */
+    .word-content h1 { font-size: 1.75rem; font-weight: 800; margin-top: 1.5rem; margin-bottom: 0.75rem; color: #0f172a; }
+    .word-content h2 { font-size: 1.35rem; font-weight: 700; margin-top: 1.25rem; margin-bottom: 0.5rem; color: #1e293b; }
+    .word-content h3 { font-size: 1.1rem; font-weight: 600; margin-top: 1rem; margin-bottom: 0.5rem; color: #334155; }
+    .word-content p { font-size: 0.95rem; line-height: 1.6; margin-bottom: 0.75rem; color: #334155; }
+    .word-content ul { list-style-type: disc; padding-left: 1.5rem; margin-bottom: 1rem; }
+    .word-content ol { list-style-type: decimal; padding-left: 1.5rem; margin-bottom: 1rem; }
+    .word-content img { max-width: 100%; height: auto; border-radius: 0.5rem; border: 1px solid #e2e8f0; margin: 1rem 0; box-shadow: 0 1px 3px 0 rgba(0,0,0,0.1); }
+    .word-content table { width: 100%; border-collapse: collapse; margin: 1rem 0; }
+    .word-content th, .word-content td { border: 1px solid #cbd5e1; padding: 0.5rem 0.75rem; font-size: 0.875rem; }
+    .word-content th { background-color: #f8fafc; font-weight: 600; }
+  </style>
 </head>
-<body class="bg-brand-bgLight text-slate-800 font-sans min-h-screen flex flex-col antialiased">
+<body class="bg-slate-100 text-slate-800 font-sans min-h-screen">
 
-  <!-- Header -->
-  <header class="bg-brand-navy text-white shadow-md">
-    <div class="max-w-7xl mx-auto px-6 py-5 flex justify-between items-center">
-      <div class="flex items-center gap-4">
-        <div class="bg-brand-primary p-3 rounded-xl shadow-inner">
-          <i class="fa-solid fa-book text-2xl text-white"></i>
-        </div>
-        <div>
-          <h1 class="text-xl font-bold tracking-tight text-white">CENTRO DE MANUALES CORPORATIVOS</h1>
-          <p class="text-xs text-slate-300 font-medium">Área de Administración de Ventas y Procesos Internos</p>
-        </div>
-      </div>
-      <div class="flex items-center gap-3">
-        <button onclick="exportDatabase()" class="bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold px-3 py-2 rounded-lg shadow flex items-center gap-2">
-          <i class="fa-solid fa-download"></i> Exportar Datos
-        </button>
-        <button onclick="document.getElementById('import-input').click()" class="bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold px-3 py-2 rounded-lg shadow flex items-center gap-2">
-          <i class="fa-solid fa-upload"></i> Importar Datos
-        </button>
-        <input type="file" id="import-input" accept=".json" class="hidden" onchange="importDatabase(event)">
-      </div>
-    </div>
-  </header>
-
-  <!-- Navegación -->
-  <nav class="bg-white border-b border-brand-border sticky top-0 z-30 shadow-sm overflow-x-auto">
-    <div class="max-w-7xl mx-auto px-6 flex space-x-1 min-w-max">
-      <button onclick="switchTab('vis-prov')" id="tab-vis-prov" class="tab-btn px-4 py-3.5 font-medium text-xs border-b-2 border-brand-primary text-brand-primary flex items-center gap-2">
-        <i class="fa-solid fa-building text-blue-600"></i> Vis. Manual Proveedor
-      </button>
-      <button onclick="switchTab('mod-prov')" id="tab-mod-prov" class="tab-btn px-4 py-3.5 font-medium text-xs border-b-2 border-transparent text-slate-500 hover:text-slate-800 flex items-center gap-2">
-        <i class="fa-solid fa-pen-to-square text-blue-600"></i> Mod. Manual Proveedor
-      </button>
-
-      <div class="h-6 w-px bg-slate-200 self-center mx-1"></div>
-
-      <button onclick="switchTab('vis-int')" id="tab-vis-int" class="tab-btn px-4 py-3.5 font-medium text-xs border-b-2 border-transparent text-slate-500 hover:text-slate-800 flex items-center gap-2">
-        <i class="fa-solid fa-file-lines text-purple-600"></i> Vis. Manual Interno
-      </button>
-      <button onclick="switchTab('mod-int')" id="tab-mod-int" class="tab-btn px-4 py-3.5 font-medium text-xs border-b-2 border-transparent text-slate-500 hover:text-slate-800 flex items-center gap-2">
-        <i class="fa-solid fa-file-pen text-purple-600"></i> Mod. Manual Interno
-      </button>
-
-      <div class="h-6 w-px bg-slate-200 self-center mx-1"></div>
-
-      <button onclick="switchTab('upload-bulk')" id="tab-upload-bulk" class="tab-btn px-4 py-3.5 font-medium text-xs border-b-2 border-transparent text-slate-500 hover:text-slate-800 flex items-center gap-2">
-        <i class="fa-solid fa-cloud-arrow-up text-emerald-600"></i> Carga Masiva
-      </button>
-      <button onclick="switchTab('admin')" id="tab-admin" class="tab-btn px-4 py-3.5 font-medium text-xs border-b-2 border-transparent text-slate-500 hover:text-slate-800 flex items-center gap-2">
-        <i class="fa-solid fa-sliders text-slate-600"></i> Administración
-      </button>
-    </div>
-  </nav>
-
-  <main class="max-w-7xl mx-auto px-6 py-8 flex-1 w-full">
-
-    <!-- 1. VISUALIZACIÓN MANUAL PROVEEDOR -->
-    <section id="section-vis-prov" class="tab-content space-y-6">
-      <div class="bg-white p-6 rounded-xl border border-brand-border shadow-sm">
-        <h2 class="text-lg font-bold text-brand-navy mb-1 flex items-center gap-2">
-          <i class="fa-solid fa-magnifying-glass text-brand-primary"></i> Consultar Manual de Proveedor (Clientes)
-        </h2>
-        <p class="text-xs text-slate-500 mb-5">Busque el cliente para abrir su manual en modo solo lectura.</p>
-        <div class="relative max-w-xl">
-          <input type="text" id="search-input-vis-prov" onfocus="filterDropdown('vis-prov')" oninput="filterDropdown('vis-prov')" placeholder="🔍 Buscar por cliente (ej: ANTAMINA)..." class="w-full pl-10 pr-4 py-3 bg-slate-50 border border-slate-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-brand-primary">
-          <i class="fa-solid fa-building text-slate-400 absolute left-3.5 top-3.5 text-sm"></i>
-          <ul id="dropdown-vis-prov" class="hidden absolute left-0 right-0 top-full mt-1 bg-white border border-slate-200 rounded-lg shadow-xl max-h-60 overflow-y-auto z-50 divide-y divide-slate-100"></ul>
-        </div>
-      </div>
-
-      <div id="card-vis-prov" class="hidden bg-white p-6 rounded-xl border border-brand-border shadow-sm space-y-4">
-        <div class="flex justify-between items-center border-b border-slate-100 pb-4">
-          <h3 id="title-vis-prov" class="text-xl font-bold text-brand-navy">---</h3>
-          <span class="text-xs bg-amber-50 text-amber-700 font-bold px-2.5 py-1 rounded-full"><i class="fa-solid fa-lock mr-1"></i> Modo Solo Lectura</span>
-        </div>
-        <div id="viewer-vis-prov" class="p-6 bg-slate-50 border border-slate-200 rounded-lg max-h-[500px] overflow-y-auto prose prose-sm max-w-none text-slate-800"></div>
-      </div>
-    </section>
-
-    <!-- 2. MODIFICACIÓN MANUAL PROVEEDOR -->
-    <section id="section-mod-prov" class="tab-content hidden space-y-6">
-      <div class="bg-white p-6 rounded-xl border border-brand-border shadow-sm">
-        <h2 class="text-lg font-bold text-brand-navy mb-1 flex items-center gap-2">
-          <i class="fa-solid fa-pen-to-square text-brand-primary"></i> Modificación de Manual de Proveedor
-        </h2>
-        <p class="text-xs text-slate-500 mb-5">Seleccione el cliente para editar su documento en el editor integrado.</p>
-        <div class="relative max-w-xl">
-          <input type="text" id="search-input-mod-prov" onfocus="filterDropdown('mod-prov')" oninput="filterDropdown('mod-prov')" placeholder="🔍 Buscar cliente a editar..." class="w-full pl-10 pr-4 py-3 bg-slate-50 border border-slate-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-brand-primary">
-          <i class="fa-solid fa-building text-slate-400 absolute left-3.5 top-3.5 text-sm"></i>
-          <ul id="dropdown-mod-prov" class="hidden absolute left-0 right-0 top-full mt-1 bg-white border border-slate-200 rounded-lg shadow-xl max-h-60 overflow-y-auto z-50 divide-y divide-slate-100"></ul>
-        </div>
-      </div>
-
-      <div id="card-mod-prov" class="hidden bg-white p-6 rounded-xl border border-brand-border shadow-sm space-y-4">
-        <div class="flex justify-between items-center border-b border-slate-100 pb-4">
-          <h3 id="title-mod-prov" class="text-xl font-bold text-brand-navy">---</h3>
-          <span class="text-xs bg-blue-50 text-blue-700 font-bold px-2.5 py-1 rounded-full"><i class="fa-solid fa-pen mr-1"></i> Editor Habilitado</span>
-        </div>
-        <div id="editor-mod-prov" contenteditable="true" class="p-6 bg-white border-2 border-blue-200 focus:border-blue-500 rounded-lg min-h-[300px] max-h-[500px] overflow-y-auto outline-none text-slate-800"></div>
-        <div class="text-right">
-          <button onclick="saveManualChanges('mod-prov')" class="px-5 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold rounded-lg shadow flex items-center gap-2 ml-auto">
-            <i class="fa-solid fa-floppy-disk"></i> GUARDAR CAMBIOS DE MANUAL
-          </button>
-        </div>
-      </div>
-    </section>
-
-    <!-- 3. VISUALIZACIÓN MANUAL INTERNO -->
-    <section id="section-vis-int" class="tab-content hidden space-y-6">
-      <div class="bg-white p-6 rounded-xl border border-brand-border shadow-sm">
-        <h2 class="text-lg font-bold text-purple-900 mb-1 flex items-center gap-2">
-          <i class="fa-solid fa-file-lines text-purple-600"></i> Consultar Manual Interno
-        </h2>
-        <p class="text-xs text-slate-500 mb-5">Busque guías internas como requerimientos, normativas o flujos operativos.</p>
-        <div class="relative max-w-xl">
-          <input type="text" id="search-input-vis-int" onfocus="filterDropdown('vis-int')" oninput="filterDropdown('vis-int')" placeholder="🔍 Buscar manual interno..." class="w-full pl-10 pr-4 py-3 bg-slate-50 border border-slate-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-purple-600">
-          <i class="fa-solid fa-file-lines text-slate-400 absolute left-3.5 top-3.5 text-sm"></i>
-          <ul id="dropdown-vis-int" class="hidden absolute left-0 right-0 top-full mt-1 bg-white border border-slate-200 rounded-lg shadow-xl max-h-60 overflow-y-auto z-50 divide-y divide-slate-100"></ul>
-        </div>
-      </div>
-
-      <div id="card-vis-int" class="hidden bg-white p-6 rounded-xl border border-brand-border shadow-sm space-y-4">
-        <div class="flex justify-between items-center border-b border-slate-100 pb-4">
-          <h3 id="title-vis-int" class="text-xl font-bold text-purple-900">---</h3>
-          <span class="text-xs bg-amber-50 text-amber-700 font-bold px-2.5 py-1 rounded-full"><i class="fa-solid fa-lock mr-1"></i> Modo Solo Lectura</span>
-        </div>
-        <div id="viewer-vis-int" class="p-6 bg-slate-50 border border-slate-200 rounded-lg max-h-[500px] overflow-y-auto prose prose-sm max-w-none text-slate-800"></div>
-      </div>
-    </section>
-
-    <!-- 4. MODIFICACIÓN MANUAL INTERNO -->
-    <section id="section-mod-int" class="tab-content hidden space-y-6">
-      <div class="bg-white p-6 rounded-xl border border-brand-border shadow-sm">
-        <h2 class="text-lg font-bold text-purple-900 mb-1 flex items-center gap-2">
-          <i class="fa-solid fa-file-pen text-purple-600"></i> Modificación de Manual Interno
-        </h2>
-        <p class="text-xs text-slate-500 mb-5">Seleccione el procedimiento interno para editar su documento directamente.</p>
-        <div class="relative max-w-xl">
-          <input type="text" id="search-input-mod-int" onfocus="filterDropdown('mod-int')" oninput="filterDropdown('mod-int')" placeholder="🔍 Buscar manual interno a editar..." class="w-full pl-10 pr-4 py-3 bg-slate-50 border border-slate-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-purple-600">
-          <i class="fa-solid fa-file-lines text-slate-400 absolute left-3.5 top-3.5 text-sm"></i>
-          <ul id="dropdown-mod-int" class="hidden absolute left-0 right-0 top-full mt-1 bg-white border border-slate-200 rounded-lg shadow-xl max-h-60 overflow-y-auto z-50 divide-y divide-slate-100"></ul>
-        </div>
-      </div>
-
-      <div id="card-mod-int" class="hidden bg-white p-6 rounded-xl border border-brand-border shadow-sm space-y-4">
-        <div class="flex justify-between items-center border-b border-slate-100 pb-4">
-          <h3 id="title-mod-int" class="text-xl font-bold text-purple-900">---</h3>
-          <span class="text-xs bg-purple-50 text-purple-700 font-bold px-2.5 py-1 rounded-full"><i class="fa-solid fa-pen mr-1"></i> Editor Habilitado</span>
-        </div>
-        <div id="editor-mod-int" contenteditable="true" class="p-6 bg-white border-2 border-purple-200 focus:border-purple-500 rounded-lg min-h-[300px] max-h-[500px] overflow-y-auto outline-none text-slate-800"></div>
-        <div class="text-right">
-          <button onclick="saveManualChanges('mod-int')" class="px-5 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold rounded-lg shadow flex items-center gap-2 ml-auto">
-            <i class="fa-solid fa-floppy-disk"></i> GUARDAR CAMBIOS DE MANUAL
-          </button>
-        </div>
-      </div>
-    </section>
-
-    <!-- 5. CARGA MASIVA DE MANUALES -->
-    <section id="section-upload-bulk" class="tab-content hidden space-y-6">
-      <div class="bg-white p-6 rounded-xl border border-brand-border shadow-sm">
-        <h2 class="text-lg font-bold text-brand-navy mb-1 flex items-center gap-2">
-          <i class="fa-solid fa-cloud-arrow-up text-emerald-600"></i> Cargar y Clasificar Manuales (.docx)
-        </h2>
-        <p class="text-xs text-slate-500 mb-4">Seleccione la categoría y cargue los archivos desde su computadora:</p>
-
-        <div class="flex gap-4 mb-6">
-          <label class="flex items-center gap-2 p-3 border rounded-lg cursor-pointer bg-slate-50 hover:bg-blue-50 border-slate-200">
-            <input type="radio" name="manual-category" value="PROVEEDOR" checked class="accent-blue-600">
-            <div>
-              <p class="text-xs font-bold text-slate-800">Manuales de Proveedores (Portales de Clientes)</p>
-              <p class="text-[11px] text-slate-400">Ej: ANTAMINA, FERREYROS, ALICORP</p>
-            </div>
-          </label>
-          <label class="flex items-center gap-2 p-3 border rounded-lg cursor-pointer bg-slate-50 hover:bg-purple-50 border-slate-200">
-            <input type="radio" name="manual-category" value="INTERNO" class="accent-purple-600">
-            <div>
-              <p class="text-xs font-bold text-slate-800">Manuales Internos (Procesos Operativos)</p>
-              <p class="text-[11px] text-slate-400">Ej: Solicitud de Requerimientos, Guías Internas</p>
-            </div>
-          </label>
-        </div>
-
-        <div class="border-2 border-dashed border-slate-300 p-8 rounded-xl text-center bg-slate-50 hover:bg-slate-100 transition-all cursor-pointer" onclick="document.getElementById('file-input').click()">
-          <i class="fa-solid fa-file-word text-blue-600 text-4xl mb-3"></i>
-          <p class="text-sm font-bold text-slate-700 mb-1">Haga clic o arrastre aquí sus manuales Word (.docx)</p>
-          <input type="file" id="file-input" multiple accept=".docx" class="hidden" onchange="handleBulkFiles(this.files)">
-        </div>
-
-        <div class="mt-6">
-          <h3 class="text-xs font-bold text-slate-700 uppercase tracking-wider mb-3">Documentos guardados en memoria local:</h3>
-          <div id="processed-files-list" class="space-y-2">
-            <p class="text-xs text-slate-400 italic">Cargue archivos para guardarlos de forma permanente.</p>
+  <!-- HEADER NAVIGATION -->
+  <header class="bg-white shadow-sm border-b border-slate-200 sticky top-0 z-20">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex justify-between h-16 items-center">
+        <div class="flex items-center gap-3">
+          <div class="bg-blue-600 text-white p-2 rounded-lg">
+            <i class="fa-solid fa-book-bookmark text-xl"></i>
+          </div>
+          <div>
+            <h1 class="text-lg font-bold text-slate-900 leading-tight">Manuales Corporativos</h1>
+            <p class="text-xs text-slate-500">Gestión de Proveedores y Procesos Internos</p>
           </div>
         </div>
       </div>
-    </section>
+      
+      <!-- NAV TABS -->
+      <nav class="flex space-x-1 border-t border-slate-100 overflow-x-auto text-sm font-medium py-2">
+        <button onclick="setActiveTab('vis-prov')" id="tab-vis-prov" class="tab-btn px-3 py-2 rounded-md flex items-center gap-2 text-slate-600 hover:bg-slate-100 transition">
+          <i class="fa-solid fa-building text-blue-600"></i> Vis. Manual Proveedor
+        </button>
+        <button onclick="setActiveTab('mod-prov')" id="tab-mod-prov" class="tab-btn px-3 py-2 rounded-md flex items-center gap-2 text-slate-600 hover:bg-slate-100 transition">
+          <i class="fa-solid fa-pen-to-square text-blue-600"></i> Mod. Manual Proveedor
+        </button>
+        <button onclick="setActiveTab('vis-int')" id="tab-vis-int" class="tab-btn px-3 py-2 rounded-md flex items-center gap-2 text-slate-600 hover:bg-slate-100 transition">
+          <i class="fa-solid fa-file-lines text-purple-600"></i> Vis. Manual Interno
+        </button>
+        <button onclick="setActiveTab('mod-int')" id="tab-mod-int" class="tab-btn px-3 py-2 rounded-md flex items-center gap-2 text-slate-600 hover:bg-slate-100 transition">
+          <i class="fa-solid fa-file-pen text-purple-600"></i> Mod. Manual Interno
+        </button>
+        <button onclick="setActiveTab('carga')" id="tab-carga" class="tab-btn px-3 py-2 rounded-md flex items-center gap-2 text-slate-600 hover:bg-slate-100 transition">
+          <i class="fa-solid fa-cloud-arrow-up text-emerald-600"></i> Carga Masiva
+        </button>
+        <button onclick="setActiveTab('admin')" id="tab-admin" class="tab-btn px-3 py-2 rounded-md flex items-center gap-2 text-slate-600 hover:bg-slate-100 transition">
+          <i class="fa-solid fa-sliders text-slate-600"></i> Administración General
+        </button>
+      </nav>
+    </div>
+  </header>
 
-    <!-- 6. ADMINISTRACIÓN -->
-    <section id="section-admin" class="tab-content hidden space-y-6">
-      <div class="bg-white p-6 rounded-xl border border-brand-border shadow-sm">
-        <h2 class="text-lg font-bold text-brand-navy mb-1"><i class="fa-solid fa-sliders text-brand-primary"></i> Directorio Consolidado de Manuales</h2>
-        <p class="text-xs text-slate-500 mb-4">Registro ordenado por tipo de manual guardado permanentemente.</p>
-        <div class="overflow-x-auto">
-          <table class="w-full text-left text-xs text-slate-600">
-            <thead class="bg-slate-100 text-slate-700 font-bold uppercase">
-              <tr>
-                <th class="p-3">Categoría</th>
-                <th class="p-3">Nombre / Identificador</th>
-                <th class="p-3">Estado de Lectura</th>
-                <th class="p-3 text-right">Acción</th>
-              </tr>
-            </thead>
-            <tbody id="admin-table-body" class="divide-y divide-slate-100"></tbody>
-          </table>
-        </div>
-      </div>
-    </section>
-
+  <!-- MAIN CONTAINER -->
+  <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <div id="contentView" class="bg-white rounded-xl shadow-sm border border-slate-200 p-6"></div>
   </main>
 
+  <!-- MODAL EDITAR -->
+  <div id="editModal" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm hidden items-center justify-center z-50">
+    <div class="bg-white rounded-xl shadow-xl border border-slate-200 max-w-md w-full p-6 mx-4">
+      <div class="flex justify-between items-center mb-4">
+        <h3 class="text-lg font-bold text-slate-800">Editar Manual</h3>
+        <button onclick="closeModal('editModal')" class="text-slate-400 hover:text-slate-600">
+          <i class="fa-solid fa-xmark text-lg"></i>
+        </button>
+      </div>
+      <form id="editForm" onsubmit="saveEdit(event)">
+        <input type="hidden" id="editId">
+        <div class="mb-4">
+          <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Tipo de Manual</label>
+          <select id="editCategory" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm outline-none focus:ring-2 focus:ring-blue-500">
+            <option value="PROVEEDOR">PROVEEDOR</option>
+            <option value="INTERNO">INTERNO</option>
+          </select>
+        </div>
+        <div class="mb-6">
+          <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Nombre / Identificador</label>
+          <input type="text" id="editName" required class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm outline-none focus:ring-2 focus:ring-blue-500">
+        </div>
+        <div class="flex justify-end gap-2">
+          <button type="button" onclick="closeModal('editModal')" class="px-4 py-2 bg-slate-100 text-slate-700 hover:bg-slate-200 rounded-lg text-sm font-medium">Cancelar</button>
+          <button type="submit" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-sm font-medium">Guardar Cambios</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
   <script>
-    // Carga de la base de datos almacenada localmente
-    let docsDatabase = JSON.parse(localStorage.getItem('docsDatabase')) || [];
-    let selectedDoc = null;
+    const initialManuals = [
+      { id: 1, category: 'PROVEEDOR', name: 'MINERA COLQUISIRI S.A.', filename: 'MINERA_COLQUISIRI.docx', date: '2026-01-15', contentHtml: '' },
+      { id: 2, category: 'PROVEEDOR', name: 'TECHINT S.A.C.', filename: 'TECHINT_SAC.docx', date: '2026-01-18', contentHtml: '' },
+      { id: 3, category: 'PROVEEDOR', name: 'UNION CONCRETERAS S.A.C.', filename: 'UNION_CONCRETERAS.docx', date: '2026-01-20', contentHtml: '' },
+      { id: 4, category: 'PROVEEDOR', name: 'ADMINISTRACIÓN DE EMPRESAS S.A.C.', filename: 'ADMINISTRACION_EMPRESAS.docx', date: '2026-02-01', contentHtml: '' },
+      { id: 5, category: 'PROVEEDOR', name: 'NEXA RESOURCES S.A.A.', filename: 'NEXA_RESOURCES.docx', date: '2026-02-05', contentHtml: '' },
+      { id: 6, category: 'PROVEEDOR', name: 'HOLCIM PERÚ AGREGADOS S.A.C.', filename: 'HOLCIM_PERU.docx', date: '2026-02-10', contentHtml: '' },
+      { id: 7, category: 'PROVEEDOR', name: 'FERREYROS S.A.A.', filename: 'FERREYROS_SAA.docx', date: '2026-02-12', contentHtml: '' },
+      { id: 8, category: 'INTERNO', name: 'PROCEDIMIENTO DE SOLICITUD DE REQUERIMIENTOS', filename: 'PROC_REQUERIMIENTOS.docx', date: '2026-02-15', contentHtml: '' },
+      { id: 9, category: 'INTERNO', name: 'GUÍA OPERATIVA DE GUÍAS INTERNAS DE REMISIÓN', filename: 'GUIA_REMISION.docx', date: '2026-02-20', contentHtml: '' }
+    ];
 
-    document.addEventListener('DOMContentLoaded', () => {
-      renderAdminTable();
-      renderStoredFileList();
-    });
+    let manuals = JSON.parse(localStorage.getItem('manuals_db')) || initialManuals;
+    let currentTab = 'vis-prov';
 
-    function saveToLocalStorage() {
-      localStorage.setItem('docsDatabase', JSON.stringify(docsDatabase));
+    function saveStorage() {
+      try {
+        localStorage.setItem('manuals_db', JSON.stringify(manuals));
+      } catch (e) {
+        console.warn('LocalStorage excedido al guardar contenido de imágenes grandes.');
+      }
     }
 
-    function switchTab(tab) {
-      document.querySelectorAll('.tab-btn').forEach(b => {
-        b.classList.remove('border-brand-primary', 'text-brand-primary');
-        b.classList.add('border-transparent', 'text-slate-500');
+    function setActiveTab(tabId) {
+      currentTab = tabId;
+      document.querySelectorAll('.tab-btn').forEach(btn => {
+        btn.classList.remove('bg-blue-50', 'text-blue-600', 'font-semibold', 'border', 'border-blue-200');
+        btn.classList.add('text-slate-600');
       });
-      document.querySelectorAll('.tab-content').forEach(c => c.classList.add('hidden'));
 
-      document.getElementById(`tab-${tab}`).classList.add('border-brand-primary', 'text-brand-primary');
-      document.getElementById(`section-${tab}`).classList.remove('hidden');
+      const activeBtn = document.getElementById(`tab-${tabId}`);
+      if (activeBtn) {
+        activeBtn.classList.add('bg-blue-50', 'text-blue-600', 'font-semibold', 'border', 'border-blue-200');
+        activeBtn.classList.remove('text-slate-600');
+      }
+
+      renderView();
     }
 
-    function extractName(filename) {
-      return filename
-        .replace(/\.docx$/i, '')
-        .replace(/\s*-\s*(Manual|Gu[íi]a).*$/i, '')
-        .replace(/^Manual\s*-\s*/i, '')
-        .trim();
+    function renderView() {
+      const container = document.getElementById('contentView');
+
+      if (currentTab === 'carga') {
+        container.innerHTML = getCargaViewHTML();
+        initDropzone();
+        return;
+      }
+
+      let categoryFilter = '';
+      let isEditable = false;
+      let title = '';
+      let subtitle = '';
+
+      switch(currentTab) {
+        case 'vis-prov':
+          categoryFilter = 'PROVEEDOR';
+          isEditable = false;
+          title = 'Visualización de Manuales de Proveedores';
+          subtitle = 'Consulta del documento oficial completo y paso a paso con imágenes adjuntas.';
+          break;
+        case 'mod-prov':
+          categoryFilter = 'PROVEEDOR';
+          isEditable = true;
+          title = 'Modificación de Manuales de Proveedores';
+          subtitle = 'Edición y eliminación de registros de manuales de proveedores.';
+          break;
+        case 'vis-int':
+          categoryFilter = 'INTERNO';
+          isEditable = false;
+          title = 'Visualización de Manuales Internos';
+          subtitle = 'Consulta del paso a paso completo de manuales e instructivos internos.';
+          break;
+        case 'mod-int':
+          categoryFilter = 'INTERNO';
+          isEditable = true;
+          title = 'Modificación de Manuales Internos';
+          subtitle = 'Gestión y modificación de manuales e instructivos internos.';
+          break;
+        case 'admin':
+          categoryFilter = 'ALL';
+          isEditable = true;
+          title = 'Directorio Consolidado Completo';
+          subtitle = 'Panel general para la administración de todos los manuales registrados.';
+          break;
+      }
+
+      container.innerHTML = getTableViewHTML(title, subtitle, isEditable);
+      filterAndRenderRows(categoryFilter, isEditable);
     }
 
-    function handleBulkFiles(files) {
-      if (!files.length) return;
-      const category = document.querySelector('input[name="manual-category"]:checked').value;
+    function getTableViewHTML(title, subtitle, isEditable) {
+      return `
+        <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-6 border-b border-slate-100">
+          <div>
+            <h2 class="text-xl font-bold text-slate-800">${title}</h2>
+            <p class="text-sm text-slate-500 mt-1">${subtitle}</p>
+          </div>
+          ${isEditable ? `
+            <button onclick="setActiveTab('carga')" class="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-medium text-sm rounded-lg transition">
+              <i class="fa-solid fa-plus"></i> Cargar Nuevo Manual
+            </button>
+          ` : ''}
+        </div>
+
+        <div class="my-6">
+          <div class="relative w-full max-w-md">
+            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400">
+              <i class="fa-solid fa-magnifying-glass"></i>
+            </div>
+            <input type="text" id="tableSearch" oninput="handleSearch()" placeholder="Buscar por nombre..." class="w-full pl-10 pr-4 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 outline-none transition">
+          </div>
+        </div>
+
+        <div class="overflow-x-auto rounded-lg border border-slate-200">
+          <table class="w-full text-left border-collapse">
+            <thead>
+              <tr class="bg-slate-50 text-slate-600 text-xs uppercase tracking-wider border-b border-slate-200">
+                <th class="py-3 px-4 font-semibold">Tipo</th>
+                <th class="py-3 px-4 font-semibold">Nombre / Identificador</th>
+                <th class="py-3 px-4 font-semibold">Estado</th>
+                <th class="py-3 px-4 font-semibold text-right">Acción</th>
+              </tr>
+            </thead>
+            <tbody id="rowsContainer" class="divide-y divide-slate-100 text-sm"></tbody>
+          </table>
+          <div id="noDataState" class="hidden py-12 text-center text-slate-400">
+            <i class="fa-solid fa-folder-open text-4xl mb-2"></i>
+            <p class="text-sm">No se encontraron manuales en esta sección.</p>
+          </div>
+        </div>
+      `;
+    }
+
+    function filterAndRenderRows(category, isEditable) {
+      const query = (document.getElementById('tableSearch')?.value || '').toLowerCase();
+      const container = document.getElementById('rowsContainer');
+      const noData = document.getElementById('noDataState');
+      
+      container.innerHTML = '';
+
+      let list = manuals;
+      if (category !== 'ALL') {
+        list = list.filter(m => m.category === category);
+      }
+
+      if (query) {
+        list = list.filter(m => m.name.toLowerCase().includes(query));
+      }
+
+      if (list.length === 0) {
+        noData.classList.remove('hidden');
+        return;
+      }
+      noData.classList.add('hidden');
+
+      list.forEach(item => {
+        const tr = document.createElement('tr');
+        tr.className = 'hover:bg-slate-50 transition border-b border-slate-100';
+        tr.innerHTML = `
+          <td class="py-3 px-4">
+            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold ${item.category === 'PROVEEDOR' ? 'bg-blue-100 text-blue-800' : 'bg-purple-100 text-purple-800'}">
+              ${item.category}
+            </span>
+          </td>
+          <td class="py-3 px-4 font-semibold text-slate-800">${item.name}</td>
+          <td class="py-3 px-4">
+            <span class="inline-flex items-center gap-1.5 text-xs text-emerald-600 font-medium">
+              <i class="fa-solid fa-circle-check"></i> Listo para visualizar
+            </span>
+          </td>
+          <td class="py-3 px-4 text-right space-x-1">
+            <button onclick="displayFullManual(${item.id})" class="px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white text-xs font-medium rounded-md transition shadow-sm inline-flex items-center gap-1.5">
+              <i class="fa-solid fa-book-open"></i> Visualizar Manual
+            </button>
+            ${isEditable ? `
+              <button onclick="openEditModal(${item.id})" title="Editar" class="p-1.5 text-slate-500 hover:text-amber-600 hover:bg-amber-50 rounded-lg transition">
+                <i class="fa-solid fa-pen"></i>
+              </button>
+              <button onclick="deleteManual(${item.id})" title="Eliminar" class="p-1.5 text-slate-500 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition">
+                <i class="fa-solid fa-trash-can"></i>
+              </button>
+            ` : ''}
+          </td>
+        `;
+        container.appendChild(tr);
+      });
+    }
+
+    // VISUALIZADOR COMPLETO DEL DOCUMENTO CUALQUIERA SEA SU CONTENIDO CON IMÁGENES
+    function displayFullManual(id) {
+      const item = manuals.find(m => m.id === id);
+      if (!item) return;
+
+      const container = document.getElementById('contentView');
+      const filenameDisplay = item.filename || `${item.name}.docx`;
+
+      let docContentHTML = item.contentHtml;
+
+      if (!docContentHTML || docContentHTML.trim() === "") {
+        docContentHTML = `
+          <div class="p-6 bg-amber-50 border border-amber-200 rounded-xl text-center">
+            <i class="fa-solid fa-triangle-exclamation text-amber-500 text-3xl mb-2"></i>
+            <h3 class="font-bold text-slate-800 text-base mb-1">Manual registrado previamente en lista estática</h3>
+            <p class="text-sm text-slate-600 mb-4">Para ver el manual con **todas sus imágenes y pasos al pie de la letra**, por favor vuelve a subir el archivo <strong>.docx</strong> desde la pestaña <strong>Carga Masiva</strong>.</p>
+            <button onclick="setActiveTab('carga')" class="px-4 py-2 bg-blue-600 text-white rounded-lg text-xs font-semibold">Ir a Carga Masiva</button>
+          </div>
+        `;
+      }
+
+      container.innerHTML = `
+        <div class="space-y-6">
+          <div class="flex items-center justify-between pb-4 border-b border-slate-200">
+            <button onclick="renderView()" class="inline-flex items-center gap-2 px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-medium text-xs rounded-lg transition">
+              <i class="fa-solid fa-arrow-left"></i> Volver a la lista
+            </button>
+            <div class="flex items-center gap-2">
+              <span class="px-2.5 py-0.5 rounded-full text-xs font-semibold ${item.category === 'PROVEEDOR' ? 'bg-blue-100 text-blue-800' : 'bg-purple-100 text-purple-800'}">
+                ${item.category}
+              </span>
+              <button onclick="window.print()" class="px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-medium text-xs rounded-lg transition inline-flex items-center gap-1">
+                <i class="fa-solid fa-print"></i> Imprimir / PDF
+              </button>
+            </div>
+          </div>
+
+          <div class="bg-slate-50 border border-slate-200 rounded-xl p-6">
+            <h1 class="text-2xl font-extrabold text-slate-900 mb-2">${item.name}</h1>
+            <div class="flex flex-wrap items-center gap-4 text-xs text-slate-500">
+              <span><i class="fa-solid fa-file-word text-blue-600 mr-1"></i> Archivo: <strong>${filenameDisplay}</strong></span>
+              <span><i class="fa-solid fa-calendar-day mr-1"></i> Registro: ${item.date || '2026-01-01'}</span>
+              <span><i class="fa-solid fa-circle-check text-emerald-600 mr-1"></i> Documento Verificado</span>
+            </div>
+          </div>
+
+          <!-- DOCUMENT BODY FULL EXTRACTED FROM WORD -->
+          <div class="word-content bg-white p-4 rounded-xl border border-slate-100">
+            ${docContentHTML}
+          </div>
+
+          <div class="pt-6 border-t border-slate-200 flex justify-between items-center">
+            <button onclick="renderView()" class="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 text-sm font-medium rounded-lg transition">
+              <i class="fa-solid fa-arrow-left mr-1"></i> Volver a la lista
+            </button>
+          </div>
+        </div>
+      `;
+    }
+
+    function handleSearch() {
+      const category = currentTab.includes('prov') ? 'PROVEEDOR' : (currentTab.includes('int') ? 'INTERNO' : 'ALL');
+      const isEditable = currentTab.startsWith('mod') || currentTab === 'admin';
+      filterAndRenderRows(category, isEditable);
+    }
+
+    function getCargaViewHTML() {
+      return `
+        <h2 class="text-xl font-bold text-slate-800 mb-1">Carga Masiva de Manuales Word</h2>
+        <p class="text-sm text-slate-500 mb-6">Sube tus archivos Word (.docx). El contenido completo (incluyendo capturas de pantalla, pasos y tablas) se extraerá automáticamente para su visualización.</p>
+
+        <div class="mb-6 bg-slate-50 p-4 rounded-xl border border-slate-200">
+          <label class="block text-xs font-bold uppercase text-slate-600 mb-2">Destino de los manuales a cargar:</label>
+          <div class="flex flex-wrap gap-6 text-sm font-medium">
+            <label class="flex items-center gap-2 cursor-pointer">
+              <input type="radio" name="uploadType" value="PROVEEDOR" checked class="w-4 h-4 text-blue-600 focus:ring-blue-500">
+              <span class="text-slate-800"><i class="fa-solid fa-building text-blue-600 mr-1"></i> Manual de Proveedor</span>
+            </label>
+            <label class="flex items-center gap-2 cursor-pointer">
+              <input type="radio" name="uploadType" value="INTERNO" class="w-4 h-4 text-purple-600 focus:ring-purple-500">
+              <span class="text-slate-800"><i class="fa-solid fa-file-lines text-purple-600 mr-1"></i> Manual Interno</span>
+            </label>
+          </div>
+        </div>
+
+        <div id="dropzone" class="border-2 border-dashed border-blue-300 hover:border-blue-500 rounded-xl p-10 text-center bg-blue-50/40 hover:bg-blue-50 transition cursor-pointer">
+          <div class="flex flex-col items-center">
+            <div class="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center text-blue-600 mb-3">
+              <i class="fa-solid fa-file-word text-3xl"></i>
+            </div>
+            <p class="text-slate-800 font-semibold mb-1">Haga clic o arrastre aquí sus manuales Word (.docx)</p>
+            <p class="text-xs text-slate-400">Extraerá imágenes, pasos y textos del archivo</p>
+            <input type="file" id="fileInput" accept=".docx" multiple class="hidden">
+          </div>
+        </div>
+      `;
+    }
+
+    function initDropzone() {
+      const dropzone = document.getElementById('dropzone');
+      const fileInput = document.getElementById('fileInput');
+
+      if (!dropzone) return;
+
+      dropzone.addEventListener('click', () => fileInput.click());
+      fileInput.addEventListener('change', (e) => handleFiles(e.target.files));
+    }
+
+    // EXTRAE EL TEXTO E IMÁGENES DEL ARCHIVO WORD (DOCX)
+    function handleFiles(files) {
+      if (files.length === 0) return;
+      const selectedCategory = document.querySelector('input[name="uploadType"]:checked').value;
+
+      let processedCount = 0;
 
       Array.from(files).forEach(file => {
-        if (!file.name.endsWith('.docx')) return;
-        const name = extractName(file.name);
-
+        const cleanName = file.name.replace(/\.[^/.]+$/, "").toUpperCase();
         const reader = new FileReader();
-        reader.onload = function(e) {
-          const arrayBuffer = e.target.result;
-          mammoth.convertToHtml({ arrayBuffer: arrayBuffer })
-            .then(function(result) {
-              let htmlContent = result.value || "<p><i>Documento vacío</i></p>";
-              
-              let existing = docsDatabase.find(d => d.name.toLowerCase() === name.toLowerCase() && d.category === category);
-              if (!existing) {
-                docsDatabase.push({
-                  id: Date.now(),
-                  category: category,
-                  name: name,
-                  docx: file.name,
-                  html: htmlContent
-                });
-              } else {
-                existing.docx = file.name;
-                existing.html = htmlContent;
-              }
 
-              saveToLocalStorage();
-              renderAdminTable();
-              renderStoredFileList();
+        reader.onload = function(event) {
+          const arrayBuffer = event.target.result;
+          
+          // Opciones de Mammoth para convertir imágenes incrustadas
+          const options = {
+            convertImage: mammoth.images.imgElement(function(image) {
+              return image.read("base64").then(function(imageBuffer) {
+                return {
+                  src: "data:" + image.contentType + ";base64," + imageBuffer
+                };
+              });
+            })
+          };
+
+          mammoth.convertToHtml({ arrayBuffer: arrayBuffer }, options)
+            .then(function(result) {
+              const htmlContent = result.value;
+              
+              manuals.unshift({
+                id: Date.now() + Math.floor(Math.random() * 1000),
+                category: selectedCategory,
+                name: cleanName,
+                filename: file.name,
+                date: new Date().toISOString().split('T')[0],
+                contentHtml: htmlContent
+              });
+              
+              processedCount++;
+              if (processedCount === files.length) {
+                saveStorage();
+                alert(`${files.length} manual(es) procesado(s) exitosamente con sus pasos e imágenes.`);
+                setActiveTab(selectedCategory === 'PROVEEDOR' ? 'vis-prov' : 'vis-int');
+              }
+            })
+            .catch(function(err) {
+              console.error(err);
+              processedCount++;
             });
         };
+
         reader.readAsArrayBuffer(file);
       });
     }
 
-    function renderStoredFileList() {
-      const container = document.getElementById('processed-files-list');
-      container.innerHTML = '';
-      if (docsDatabase.length === 0) {
-        container.innerHTML = '<p class="text-xs text-slate-400 italic">No hay documentos guardados aún.</p>';
-        return;
-      }
+    function openEditModal(id) {
+      const item = manuals.find(m => m.id === id);
+      if (!item) return;
 
-      docsDatabase.forEach(d => {
-        const div = document.createElement('div');
-        div.className = 'flex justify-between items-center p-3 bg-emerald-50 border border-emerald-200 rounded-lg text-xs';
-        div.innerHTML = `
-          <div class="flex items-center gap-2">
-            <span class="px-2 py-0.5 font-bold rounded text-[10px] ${d.category === 'PROVEEDOR' ? 'bg-blue-100 text-blue-800' : 'bg-purple-100 text-purple-800'}">${d.category}</span>
-            <span class="font-bold text-slate-800">${d.docx}</span>
-            <span class="text-slate-400">➔ Registrado:</span>
-            <span class="font-extrabold text-slate-800">${d.name}</span>
-          </div>
-          <span class="text-emerald-700 font-bold"><i class="fa-solid fa-hard-drive"></i> Guardado Permanente</span>
-        `;
-        container.appendChild(div);
-      });
+      document.getElementById('editId').value = item.id;
+      document.getElementById('editCategory').value = item.category;
+      document.getElementById('editName').value = item.name;
+
+      openModal('editModal');
     }
 
-    function filterDropdown(tabType) {
-      const isInternal = tabType.endsWith('-int');
-      const category = isInternal ? 'INTERNO' : 'PROVEEDOR';
-      const input = document.getElementById(`search-input-${tabType}`).value.toLowerCase();
-      const dropdown = document.getElementById(`dropdown-${tabType}`);
-
-      const filtered = docsDatabase.filter(d => d.category === category && d.name.toLowerCase().includes(input));
-
-      dropdown.innerHTML = '';
-      if (filtered.length === 0) {
-        dropdown.innerHTML = '<li class="p-3 text-xs text-slate-400 italic">No hay documentos cargados en esta categoría</li>';
-      } else {
-        filtered.forEach(d => {
-          const li = document.createElement('li');
-          li.className = 'p-3 text-xs font-semibold text-slate-700 hover:bg-sky-50 cursor-pointer flex justify-between items-center';
-          li.innerHTML = `<span>${d.name}</span> <i class="fa-solid fa-chevron-right text-slate-300 text-[10px]"></i>`;
-          li.onclick = () => selectDoc(d, tabType);
-          dropdown.appendChild(li);
-        });
-      }
-      dropdown.classList.remove('hidden');
-    }
-
-    function selectDoc(doc, tabType) {
-      selectedDoc = doc;
-      document.getElementById(`search-input-${tabType}`).value = doc.name;
-      document.getElementById(`dropdown-${tabType}`).classList.add('hidden');
-
-      document.getElementById(`card-${tabType}`).classList.remove('hidden');
-      document.getElementById(`title-${tabType}`).innerText = doc.name;
-
-      if (tabType.startsWith('vis-')) {
-        document.getElementById(`viewer-${tabType}`).innerHTML = doc.html;
-      } else if (tabType.startsWith('mod-')) {
-        document.getElementById(`editor-${tabType}`).innerHTML = doc.html;
+    function saveEdit(e) {
+      e.preventDefault();
+      const id = parseInt(document.getElementById('editId').value);
+      const item = manuals.find(m => m.id === id);
+      
+      if (item) {
+        item.category = document.getElementById('editCategory').value;
+        item.name = document.getElementById('editName').value;
+        saveStorage();
+        renderView();
+        closeModal('editModal');
       }
     }
 
-    function saveManualChanges(tabType) {
-      if (!selectedDoc) return;
-      const updatedHtml = document.getElementById(`editor-${tabType}`).innerHTML;
-      selectedDoc.html = updatedHtml;
-      saveToLocalStorage();
-      alert(`Cambios guardados con éxito para: ${selectedDoc.name}`);
-    }
-
-    function renderAdminTable() {
-      const tbody = document.getElementById('admin-table-body');
-      tbody.innerHTML = '';
-      if (docsDatabase.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="4" class="p-4 text-center text-slate-400 italic">No hay manuales cargados. Ve a Carga Masiva y sube sus archivos Word.</td></tr>';
-        return;
+    function deleteManual(id) {
+      const item = manuals.find(m => m.id === id);
+      if (item && confirm(`¿Confirma que desea eliminar el manual "${item.name}"?`)) {
+        manuals = manuals.filter(m => m.id !== id);
+        saveStorage();
+        renderView();
       }
-
-      docsDatabase.forEach(d => {
-        const tr = document.createElement('tr');
-        tr.className = 'border-b border-slate-100 hover:bg-slate-50';
-        tr.innerHTML = `
-          <td class="p-3"><span class="px-2 py-0.5 font-bold rounded text-[10px] ${d.category === 'PROVEEDOR' ? 'bg-blue-100 text-blue-800' : 'bg-purple-100 text-purple-800'}">${d.category}</span></td>
-          <td class="p-3 font-bold text-slate-800">${d.name}</td>
-          <td class="p-3 text-emerald-600 font-medium"><i class="fa-solid fa-check"></i> Listo para visualizar/editar</td>
-          <td class="p-3 text-right">
-            <button onclick="switchTab('${d.category === 'PROVEEDOR' ? 'vis-prov' : 'vis-int'}'); selectDoc(docsDatabase.find(x => x.id === ${d.id}), '${d.category === 'PROVEEDOR' ? 'vis-prov' : 'vis-int'}');" class="text-xs bg-slate-200 hover:bg-slate-300 px-2 py-1 rounded font-semibold text-slate-700">Ver</button>
-          </td>
-        `;
-        tbody.appendChild(tr);
-      });
     }
 
-    // Exportar todos los datos guardados a un archivo JSON para compartir
-    function exportDatabase() {
-      const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(docsDatabase));
-      const downloadAnchor = document.createElement('a');
-      downloadAnchor.setAttribute("href", dataStr);
-      downloadAnchor.setAttribute("download", "manuales_corporativos_backup.json");
-      document.body.appendChild(downloadAnchor);
-      downloadAnchor.click();
-      downloadAnchor.remove();
+    function openModal(id) {
+      const el = document.getElementById(id);
+      el.classList.remove('hidden');
+      el.classList.add('flex');
     }
 
-    // Importar datos compartidos por otro usuario
-    function importDatabase(event) {
-      const fileReader = new FileReader();
-      fileReader.onload = function(e) {
-        try {
-          docsDatabase = JSON.parse(e.target.result);
-          saveToLocalStorage();
-          renderAdminTable();
-          renderStoredFileList();
-          alert("¡Base de datos de manuales importada correctamente!");
-        } catch (err) {
-          alert("Error al importar el archivo de datos.");
-        }
-      };
-      fileReader.readAsText(event.target.files[0]);
+    function closeModal(id) {
+      const el = document.getElementById(id);
+      el.classList.add('hidden');
+      el.classList.remove('flex');
     }
 
-    document.addEventListener('click', (e) => {
-      ['vis-prov', 'mod-prov', 'vis-int', 'mod-int'].forEach(type => {
-        if (!e.target.closest(`#search-input-${type}`) && !e.target.closest(`#dropdown-${type}`)) {
-          document.getElementById(`dropdown-${type}`)?.classList.add('hidden');
-        }
-      });
+    document.addEventListener('DOMContentLoaded', () => {
+      saveStorage();
+      setActiveTab('vis-prov');
     });
   </script>
 </body>
