@@ -531,24 +531,21 @@
         firebase.initializeApp(firebaseConfig);
         const db = firebase.firestore();
         
-        // Habilitar la persistencia sin conexión local para acelerar lectura
-        firebase.firestore().enablePersistence().catch(err => console.log("Persistencia local lista"));
+        firebase.firestore().enablePersistence().catch(err => console.log("Persistencia activa"));
 
         const COLLECTION = "manuales";
         let currentManuals = [];
 
-        // Cargar y escuchar la base de datos
         db.collection(COLLECTION).onSnapshot(snapshot => {
             currentManuals = [];
             snapshot.forEach(doc => {
                 currentManuals.push({ id: doc.id, ...doc.data() });
             });
             
-            // Ordenar alfabéticamente de la A a la Z
             currentManuals.sort((a, b) => (a.title || '').localeCompare(b.title || ''));
             renderAll();
         }, error => {
-            console.error("Error al sincronizar datos:", error);
+            console.error("Error Firestore:", error);
         });
 
         function showLoading(msg) {
@@ -623,25 +620,20 @@
             document.getElementById('provCountBadge').innerHTML = `<i class="fa-solid fa-magnifying-glass me-1"></i>Se encontraron ${provCount} registros`;
         }
 
-        // Compresión ultra-rápida de imágenes para no desbordar Firestore
-        function compressImages(html) {
+        // Procesa imágenes asíncronamente con Timeout para no congelar la pestaña
+        function processAndCompressImage(src) {
             return new Promise((resolve) => {
-                const div = document.createElement('div');
-                div.innerHTML = html;
-                const imgs = div.querySelectorAll('img');
-                
-                if (imgs.length === 0) return resolve(html);
+                const img = new Image();
+                const timeout = setTimeout(() => resolve(''), 3000); // 3s máximo por imagen
 
-                let done = 0;
-                imgs.forEach(img => {
-                    const canvas = document.createElement('canvas');
-                    const ctx = canvas.getContext('2d');
-                    const image = new Image();
-
-                    image.onload = () => {
-                        let width = image.width;
-                        let height = image.height;
-                        const maxDim = 800; // Reducir escala para velocidad y ahorro de espacio
+                img.onload = () => {
+                    clearTimeout(timeout);
+                    try {
+                        const canvas = document.createElement('canvas');
+                        const ctx = canvas.getContext('2d');
+                        let width = img.width;
+                        let height = img.height;
+                        const maxDim = 600;
 
                         if (width > maxDim || height > maxDim) {
                             if (width > height) {
@@ -655,21 +647,38 @@
 
                         canvas.width = width;
                         canvas.height = height;
-                        ctx.drawImage(image, 0, 0, width, height);
-                        img.src = canvas.toDataURL('image/jpeg', 0.6); // Compresión eficiente al 60%
+                        ctx.drawImage(img, 0, 0, width, height);
+                        resolve(canvas.toDataURL('image/jpeg', 0.5));
+                    } catch (e) {
+                        resolve('');
+                    }
+                };
 
-                        done++;
-                        if (done === imgs.length) resolve(div.innerHTML);
-                    };
+                img.onerror = () => {
+                    clearTimeout(timeout);
+                    resolve('');
+                };
 
-                    image.onerror = () => {
-                        done++;
-                        if (done === imgs.length) resolve(div.innerHTML);
-                    };
-
-                    image.src = img.src;
-                });
+                img.src = src;
             });
+        }
+
+        async function optimizeHtmlContent(html) {
+            const div = document.createElement('div');
+            div.innerHTML = html;
+            const imgs = Array.from(div.querySelectorAll('img'));
+
+            for (let img of imgs) {
+                if (img.src && img.src.startsWith('data:image')) {
+                    const compressedSrc = await processAndCompressImage(img.src);
+                    if (compressedSrc) {
+                        img.src = compressedSrc;
+                    } else {
+                        img.remove(); // Remueve imagen si corrompe o satura memoria
+                    }
+                }
+            }
+            return div.innerHTML;
         }
 
         async function processWordFiles(e) {
@@ -677,31 +686,45 @@
             if (!files.length) return;
 
             const uploadType = document.querySelector('input[name="uploadType"]:checked').value;
-            showLoading(`Iniciando procesamiento de ${files.length} archivo(s)...`);
-
+            
             for (let i = 0; i < files.length; i++) {
                 const file = files[i];
                 showLoading(`Procesando (${i + 1}/${files.length}): ${file.name}`);
+                
+                // Forzar refresco del DOM para que cambie el texto de la pantalla de carga
+                await new Promise(r => setTimeout(r, 50));
 
                 try {
                     const arrayBuffer = await file.arrayBuffer();
                     const result = await mammoth.convertToHtml({ arrayBuffer: arrayBuffer });
                     
-                    let htmlContent = result.value;
-                    htmlContent = await compressImages(htmlContent);
-
+                    let htmlContent = await optimizeHtmlContent(result.value);
                     const cleanTitle = file.name.replace(/\.[^/.]+$/, "").toUpperCase();
 
-                    // Guardar directamente en Firebase
-                    await db.collection(COLLECTION).add({
-                        type: uploadType,
-                        title: cleanTitle,
-                        htmlContent: htmlContent,
-                        createdAt: firebase.firestore.FieldValue.serverTimestamp()
-                    });
+                    // Guardar en Firestore con manejo de fallback si el payload es muy grande
+                    try {
+                        await db.collection(COLLECTION).add({
+                            type: uploadType,
+                            title: cleanTitle,
+                            htmlContent: htmlContent,
+                            createdAt: firebase.firestore.FieldValue.serverTimestamp()
+                        });
+                    } catch (fsErr) {
+                        // Si falla por tamaño, guardar solo el texto quitando las imágenes
+                        const divText = document.createElement('div');
+                        divText.innerHTML = htmlContent;
+                        divText.querySelectorAll('img').forEach(i => i.remove());
+                        
+                        await db.collection(COLLECTION).add({
+                            type: uploadType,
+                            title: cleanTitle,
+                            htmlContent: divText.innerHTML + "<p><i>(Imágenes omitidas por tamaño del documento)</i></p>",
+                            createdAt: firebase.firestore.FieldValue.serverTimestamp()
+                        });
+                    }
 
                 } catch (err) {
-                    console.error("Error al procesar: " + file.name, err);
+                    console.error("Error procesando: " + file.name, err);
                 }
             }
 
@@ -792,7 +815,7 @@
             if (!title) return;
 
             showLoading("Guardando cambios...");
-            htmlContent = await compressImages(htmlContent);
+            htmlContent = await optimizeHtmlContent(htmlContent);
 
             if (selectedId === 'NEW') {
                 await db.collection(COLLECTION).add({
