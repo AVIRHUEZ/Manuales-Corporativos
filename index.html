@@ -551,7 +551,6 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
     <script>
-        // Configuración e Inicialización de Firebase
         const firebaseConfig = {
             apiKey: "AIzaSyC8ymgbvCE9M_EiFEwQ_nCCqqd0Jsk9kHY",
             authDomain: "manuales-corporativos.firebaseapp.com",
@@ -565,49 +564,6 @@
         firebase.initializeApp(firebaseConfig);
         const db = firebase.firestore();
         const COLLECTION = "manuales";
-
-        // Inicializar IndexedDB local para guardar los binarios .docx
-        const LOCAL_DB_NAME = 'DocxFilesDB';
-        const LOCAL_STORE = 'files';
-
-        function openLocalDB() {
-            return new Promise((resolve, reject) => {
-                const req = indexedDB.open(LOCAL_DB_NAME, 1);
-                req.onupgradeneeded = e => e.target.result.createObjectStore(LOCAL_STORE, { keyPath: 'id' });
-                req.onsuccess = () => resolve(req.result);
-                req.onerror = () => reject(req.error);
-            });
-        }
-
-        async function saveLocalDocx(id, arrayBuffer, fileName) {
-            const ldb = await openLocalDB();
-            return new Promise((resolve, reject) => {
-                const tx = ldb.transaction(LOCAL_STORE, 'readwrite');
-                tx.objectStore(LOCAL_STORE).put({ id, arrayBuffer, fileName });
-                tx.oncomplete = () => resolve();
-                tx.onerror = () => reject(tx.error);
-            });
-        }
-
-        async function getLocalDocx(id) {
-            const ldb = await openLocalDB();
-            return new Promise((resolve) => {
-                const tx = ldb.transaction(LOCAL_STORE, 'readonly');
-                const req = tx.objectStore(LOCAL_STORE).get(id);
-                req.onsuccess = () => resolve(req.result);
-                req.onerror = () => resolve(null);
-            });
-        }
-
-        async function deleteLocalDocx(id) {
-            const ldb = await openLocalDB();
-            return new Promise((resolve) => {
-                const tx = ldb.transaction(LOCAL_STORE, 'readwrite');
-                tx.objectStore(LOCAL_STORE).delete(id);
-                tx.oncomplete = () => resolve();
-                tx.onerror = () => resolve();
-            });
-        }
 
         let currentManuals = [];
 
@@ -630,7 +586,7 @@
             document.getElementById('loadingOverlay').style.display = 'none';
         }
 
-        async function renderAll() {
+        function renderAll() {
             const tableProv = document.getElementById('tableProv');
             const tableInt = document.getElementById('tableInt');
             const tableAdmin = document.getElementById('tableAdmin');
@@ -652,15 +608,9 @@
 
             let provCount = 0;
 
-            for (const item of currentManuals) {
+            currentManuals.forEach(item => {
                 const isProv = item.type === 'PROVEEDOR';
                 if (isProv) provCount++;
-
-                const localFile = await getLocalDocx(item.id);
-                const downloadBtnHtml = localFile ? 
-                    `<button class="btn-portalsn-gray py-0 px-2 me-1" title="Descargar Word" onclick="downloadOriginalWord('${item.id}')">
-                        <i class="fa-solid fa-file-word text-primary"></i>
-                     </button>` : '';
 
                 const rowHtml = `
                     <tr>
@@ -668,14 +618,16 @@
                         <td>${item.title}</td>
                         <td><span class="badge-status-ok">DISPONIBLE</span></td>
                         <td class="text-end">
-                            <button class="btn-portalsn-gray py-0 px-2 me-1" onclick="viewFullManual('${item.id}')">
+                            <button class="btn-portalsn-gray py-0 px-2 me-1" title="Visualizar Manual" onclick="viewFullManual('${item.id}')">
                                 <i class="fa-solid fa-eye me-1"></i>Ver
                             </button>
-                            ${downloadBtnHtml}
-                            <button class="btn-portalsn-gray py-0 px-2 me-1" onclick="openInEditor('${item.id}')">
+                            <button class="btn-portalsn-gray py-0 px-2 me-1" title="Descargar documento Word" onclick="downloadWordFile('${item.id}')">
+                                <i class="fa-solid fa-file-word text-primary"></i>
+                            </button>
+                            <button class="btn-portalsn-gray py-0 px-2 me-1" title="Editar Manual" onclick="openInEditor('${item.id}')">
                                 <i class="fa-solid fa-pen"></i>
                             </button>
-                            <button class="btn-portalsn-gray py-0 px-2" onclick="deleteManual('${item.id}')">
+                            <button class="btn-portalsn-gray py-0 px-2" title="Eliminar Manual" onclick="deleteManual('${item.id}')">
                                 <i class="fa-solid fa-trash text-danger"></i>
                             </button>
                         </td>
@@ -692,23 +644,38 @@
                     intSelectManual.innerHTML += `<option value="${item.id}">${item.title}</option>`;
                 }
                 tableAdmin.innerHTML += rowHtml;
-            }
+            });
 
             document.getElementById('provCountBadge').innerHTML = `<i class="fa-solid fa-magnifying-glass me-1"></i>Se encontraron ${provCount} registros`;
         }
 
-        async function downloadOriginalWord(id) {
-            const localFile = await getLocalDocx(id);
-            if (!localFile) {
-                alert("El archivo Word original solo se encuentra disponible en la PC desde la que fue cargado.");
-                return;
-            }
+        function downloadWordFile(id) {
+            const item = currentManuals.find(m => m.id === id);
+            if (!item) return;
 
-            const blob = new Blob([localFile.arrayBuffer], { type: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document' });
+            let fileContentHtml = `
+                <html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/TR/REC-html40'>
+                <head><meta charset='utf-8'><title>${item.title}</title>
+                <style>
+                    body { font-family: Arial, sans-serif; }
+                    img { max-width: 100%; height: auto; }
+                    table { border-collapse: collapse; width: 100%; }
+                    td, th { border: 1px solid #000; padding: 5px; }
+                </style>
+                </head><body>
+                <h2>${item.title}</h2><hr/>
+                ${item.htmlContent || ''}
+                </body></html>
+            `;
+
+            const blob = new Blob(['\ufeff', fileContentHtml], {
+                type: 'application/msword'
+            });
+
             const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
             a.href = url;
-            a.download = localFile.fileName || 'manual.docx';
+            a.download = `${item.title}.doc`;
             document.body.appendChild(a);
             a.click();
             document.body.removeChild(a);
@@ -735,15 +702,12 @@
 
                     const cleanTitle = file.name.replace(/\.[^/.]+$/, "").toUpperCase();
 
-                    const docRef = await db.collection(COLLECTION).add({
+                    await db.collection(COLLECTION).add({
                         type: uploadType,
                         title: cleanTitle,
                         htmlContent: htmlContent,
                         createdAt: firebase.firestore.FieldValue.serverTimestamp()
                     });
-
-                    // Guardar copia descargable del .docx localmente asociada al ID de Firebase
-                    await saveLocalDocx(docRef.id, arrayBuffer, file.name);
                 } catch (err) {
                     console.error("Error procesando " + file.name, err);
                 }
@@ -754,7 +718,6 @@
             switchTab(uploadType === 'PROVEEDOR' ? 'vis-prov-tab' : 'vis-int-tab');
         }
 
-        // Optimización que mantiene la nitidez en Alta Definición
         function optimizeHtmlImagesHD(html) {
             return new Promise((resolve) => {
                 const div = document.createElement('div');
@@ -807,7 +770,7 @@
             });
         }
 
-        async function viewFullManual(id) {
+        function viewFullManual(id) {
             const item = currentManuals.find(m => m.id === id);
             if (!item) return;
 
@@ -815,14 +778,8 @@
             document.getElementById('modalFullContent').innerHTML = item.htmlContent || '<p>Sin contenido.</p>';
 
             const modalDownloadBtn = document.getElementById('modalDownloadBtn');
-            const localFile = await getLocalDocx(id);
-
-            if (localFile) {
-                modalDownloadBtn.style.display = 'inline-block';
-                modalDownloadBtn.onclick = () => downloadOriginalWord(id);
-            } else {
-                modalDownloadBtn.style.display = 'none';
-            }
+            modalDownloadBtn.style.display = 'inline-block';
+            modalDownloadBtn.onclick = () => downloadWordFile(id);
 
             const modal = new bootstrap.Modal(document.getElementById('viewModal'));
             modal.show();
@@ -898,7 +855,6 @@
             if (confirm("¿Está seguro de eliminar este registro?")) {
                 showLoading("Eliminando...");
                 await db.collection(COLLECTION).doc(id).delete();
-                await deleteLocalDocx(id);
                 hideLoading();
             }
         }
@@ -910,7 +866,6 @@
                 const batch = db.batch();
                 snapshot.docs.forEach(doc => {
                     batch.delete(doc.ref);
-                    deleteLocalDocx(doc.id);
                 });
                 await batch.commit();
                 hideLoading();
