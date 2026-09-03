@@ -227,8 +227,6 @@
             height: auto !important;
             display: block;
             margin: 10px auto;
-            image-rendering: -webkit-optimize-contrast;
-            image-rendering: crisp-edges;
         }
 
         .editor-toolbar {
@@ -249,24 +247,6 @@
             font-size: 11px;
         }
 
-        .editor-toolbar button:hover {
-            background: var(--blue-primary);
-            color: white;
-        }
-
-        #modalFullContent {
-            overflow-x: auto;
-            word-wrap: break-word;
-            overflow-wrap: break-word;
-        }
-
-        #modalFullContent table {
-            max-width: 100% !important;
-            width: 100% !important;
-            table-layout: fixed;
-            word-break: break-word;
-        }
-
         #loadingOverlay {
             display: none;
             position: fixed;
@@ -274,23 +254,12 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(0,0,0,0.5);
+            background: rgba(0,0,0,0.6);
             z-index: 9999;
             color: white;
             flex-direction: column;
             justify-content: center;
             align-items: center;
-        }
-
-        ::-webkit-scrollbar {
-            width: 6px;
-            height: 6px;
-        }
-        ::-webkit-scrollbar-track {
-            background: var(--bg-page);
-        }
-        ::-webkit-scrollbar-thumb {
-            background: #cccccc;
         }
     </style>
 </head>
@@ -298,7 +267,8 @@
 
     <div id="loadingOverlay">
         <div class="spinner-border text-light mb-2" role="status"></div>
-        <div id="loadingText">Procesando documentos...</div>
+        <div id="loadingText" class="fw-bold">Procesando documentos...</div>
+        <small class="text-white-50 mt-1">Por favor, no cierre esta ventana</small>
     </div>
 
     <div class="top-bar-blue d-flex justify-content-between align-items-center">
@@ -307,12 +277,12 @@
             <span class="logo-text">SISTEMA DE MANUALES Y PROCEDIMIENTOS</span>
         </div>
         <div class="d-flex align-items-center gap-2" style="font-size: 11px;">
-            <button class="btn btn-sm text-white p-0 border-0" title="Ir a Pestaña Carga" onclick="switchTab('carga-tab')">
+            <button class="btn btn-sm text-white p-0 border-0" onclick="switchTab('carga-tab')">
                 <i class="fa-solid fa-cloud-arrow-up me-1"></i>Carga Masiva
             </button>
             <span class="text-white-50">|</span>
-            <button class="btn btn-sm text-white p-0 border-0" title="Vaciar Base de Datos" onclick="clearAllData()">
-                <i class="fa-solid fa-rotate-left me-1"></i>Reiniciar
+            <button class="btn btn-sm text-white p-0 border-0" onclick="clearAllData()">
+                <i class="fa-solid fa-rotate-left me-1"></i>Reiniciar Base de Datos
             </button>
         </div>
     </div>
@@ -355,6 +325,7 @@
     <div class="container-fluid px-4 py-3">
         <div class="tab-content" id="mainTabsContent">
             
+            <!-- Vis. Manual Proveedores -->
             <div class="tab-pane fade show active" id="vis-prov" role="tabpanel">
                 <div class="section-title">Seleccione la Orden o Razón Social que desea consultar:</div>
                 <div class="content-card">
@@ -383,6 +354,7 @@
                 </div>
             </div>
 
+            <!-- Mod. Manual Proveedores -->
             <div class="tab-pane fade" id="mod-prov" role="tabpanel">
                 <div class="section-title">Edición y Registro de Manuales de Proveedores:</div>
                 <div class="content-card">
@@ -406,9 +378,6 @@
                                 <button type="button" onclick="execCmd('bold')"><b>B</b></button>
                                 <button type="button" onclick="execCmd('italic')"><i>I</i></button>
                                 <button type="button" onclick="execCmd('underline')"><u>U</u></button>
-                                <button type="button" onclick="execCmd('insertUnorderedList')"><i class="fa-solid fa-list-ul"></i></button>
-                                <button type="button" onclick="execCmd('insertOrderedList')"><i class="fa-solid fa-list-ol"></i></button>
-                                <button type="button" onclick="triggerEditorImageUpload()"><i class="fa-solid fa-image me-1"></i>Imagen</button>
                             </div>
                             <div id="provEditor" class="manual-editor" contenteditable="true"></div>
                         </div>
@@ -420,6 +389,7 @@
                 </div>
             </div>
 
+            <!-- Vis. Manual Interno -->
             <div class="tab-pane fade" id="vis-int" role="tabpanel">
                 <div class="section-title">Seleccione el Proceso Interno que desea consultar:</div>
                 <div class="content-card">
@@ -445,6 +415,7 @@
                 </div>
             </div>
 
+            <!-- Mod. Manual Interno -->
             <div class="tab-pane fade" id="mod-int" role="tabpanel">
                 <div class="section-title">Edición y Registro de Manuales Internos:</div>
                 <div class="content-card">
@@ -468,9 +439,6 @@
                                 <button type="button" onclick="execCmd('bold')"><b>B</b></button>
                                 <button type="button" onclick="execCmd('italic')"><i>I</i></button>
                                 <button type="button" onclick="execCmd('underline')"><u>U</u></button>
-                                <button type="button" onclick="execCmd('insertUnorderedList')"><i class="fa-solid fa-list-ul"></i></button>
-                                <button type="button" onclick="execCmd('insertOrderedList')"><i class="fa-solid fa-list-ol"></i></button>
-                                <button type="button" onclick="triggerEditorImageUpload()"><i class="fa-solid fa-image me-1"></i>Imagen</button>
                             </div>
                             <div id="intEditor" class="manual-editor" contenteditable="true"></div>
                         </div>
@@ -482,6 +450,7 @@
                 </div>
             </div>
 
+            <!-- Carga Masiva -->
             <div class="tab-pane fade" id="carga" role="tabpanel">
                 <div class="section-title">Carga Masiva de Archivos (.docx):</div>
                 <div class="content-card text-center py-5">
@@ -501,6 +470,7 @@
                 </div>
             </div>
 
+            <!-- Admin -->
             <div class="tab-pane fade" id="admin" role="tabpanel">
                 <div class="section-title">Consola de Administración de Documentos:</div>
                 <div class="content-card">
@@ -524,8 +494,6 @@
         </div>
     </div>
 
-    <input type="file" id="editorImgInput" accept="image/*" class="d-none" onchange="insertImageIntoEditor(event)">
-
     <!-- Modal Visualizador -->
     <div class="modal fade" id="viewModal" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog modal-xl">
@@ -541,7 +509,6 @@
                     <button type="button" id="modalDownloadBtn" class="btn-portalsn-blue">
                         <i class="fa-solid fa-file-word me-1"></i>Descargar Word
                     </button>
-                    <button type="button" class="btn-portalsn-gray" onclick="printModalContent()"><i class="fa-solid fa-print me-1"></i>Imprimir</button>
                     <button type="button" class="btn-portalsn-gray" data-bs-dismiss="modal">Cerrar</button>
                 </div>
             </div>
@@ -563,19 +530,22 @@
 
         firebase.initializeApp(firebaseConfig);
         const db = firebase.firestore();
-        const COLLECTION = "manuales";
+        
+        // Habilitar la persistencia sin conexión local para acelerar lectura
+        firebase.firestore().enablePersistence().catch(err => console.log("Persistencia local lista"));
 
+        const COLLECTION = "manuales";
         let currentManuals = [];
 
+        // Cargar y escuchar la base de datos
         db.collection(COLLECTION).onSnapshot(snapshot => {
             currentManuals = [];
             snapshot.forEach(doc => {
                 currentManuals.push({ id: doc.id, ...doc.data() });
             });
             
-            // ORDENAR ALFABÉTICAMENTE DE LA A A LA Z
+            // Ordenar alfabéticamente de la A a la Z
             currentManuals.sort((a, b) => (a.title || '').localeCompare(b.title || ''));
-
             renderAll();
         }, error => {
             console.error("Error al sincronizar datos:", error);
@@ -622,16 +592,16 @@
                         <td>${item.title}</td>
                         <td><span class="badge-status-ok">DISPONIBLE</span></td>
                         <td class="text-end">
-                            <button class="btn-portalsn-gray py-0 px-2 me-1" title="Visualizar Manual" onclick="viewFullManual('${item.id}')">
+                            <button class="btn-portalsn-gray py-0 px-2 me-1" onclick="viewFullManual('${item.id}')">
                                 <i class="fa-solid fa-eye me-1"></i>Ver
                             </button>
-                            <button class="btn-portalsn-gray py-0 px-2 me-1" title="Descargar documento Word" onclick="downloadWordFile('${item.id}')">
+                            <button class="btn-portalsn-gray py-0 px-2 me-1" onclick="downloadWordFile('${item.id}')">
                                 <i class="fa-solid fa-file-word text-primary"></i>
                             </button>
-                            <button class="btn-portalsn-gray py-0 px-2 me-1" title="Editar Manual" onclick="openInEditor('${item.id}')">
+                            <button class="btn-portalsn-gray py-0 px-2 me-1" onclick="openInEditor('${item.id}')">
                                 <i class="fa-solid fa-pen"></i>
                             </button>
-                            <button class="btn-portalsn-gray py-0 px-2" title="Eliminar Manual" onclick="deleteManual('${item.id}')">
+                            <button class="btn-portalsn-gray py-0 px-2" onclick="deleteManual('${item.id}')">
                                 <i class="fa-solid fa-trash text-danger"></i>
                             </button>
                         </td>
@@ -653,76 +623,8 @@
             document.getElementById('provCountBadge').innerHTML = `<i class="fa-solid fa-magnifying-glass me-1"></i>Se encontraron ${provCount} registros`;
         }
 
-        function downloadWordFile(id) {
-            const item = currentManuals.find(m => m.id === id);
-            if (!item) return;
-
-            let fileContentHtml = `
-                <html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/TR/REC-html40'>
-                <head><meta charset='utf-8'><title>${item.title}</title>
-                <style>
-                    body { font-family: Arial, sans-serif; }
-                    img { max-width: 100%; height: auto; }
-                    table { border-collapse: collapse; width: 100%; }
-                    td, th { border: 1px solid #000; padding: 5px; }
-                </style>
-                </head><body>
-                <h2>${item.title}</h2><hr/>
-                ${item.htmlContent || ''}
-                </body></html>
-            `;
-
-            const blob = new Blob(['\ufeff', fileContentHtml], {
-                type: 'application/msword'
-            });
-
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = `${item.title}.doc`;
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
-            URL.revokeObjectURL(url);
-        }
-
-        async function processWordFiles(e) {
-            const files = Array.from(e.target.files);
-            if (!files.length) return;
-
-            const uploadType = document.querySelector('input[name="uploadType"]:checked').value;
-            showLoading(`Procesando ${files.length} archivo(s)...`);
-
-            for (let i = 0; i < files.length; i++) {
-                const file = files[i];
-                showLoading(`Subiendo (${i + 1}/${files.length}): ${file.name}`);
-
-                try {
-                    const arrayBuffer = await file.arrayBuffer();
-                    const result = await mammoth.convertToHtml({ arrayBuffer: arrayBuffer });
-                    
-                    let htmlContent = result.value;
-                    htmlContent = await optimizeHtmlImagesHD(htmlContent);
-
-                    const cleanTitle = file.name.replace(/\.[^/.]+$/, "").toUpperCase();
-
-                    await db.collection(COLLECTION).add({
-                        type: uploadType,
-                        title: cleanTitle,
-                        htmlContent: htmlContent,
-                        createdAt: firebase.firestore.FieldValue.serverTimestamp()
-                    });
-                } catch (err) {
-                    console.error("Error procesando " + file.name, err);
-                }
-            }
-
-            hideLoading();
-            e.target.value = '';
-            switchTab(uploadType === 'PROVEEDOR' ? 'vis-prov-tab' : 'vis-int-tab');
-        }
-
-        function optimizeHtmlImagesHD(html) {
+        // Compresión ultra-rápida de imágenes para no desbordar Firestore
+        function compressImages(html) {
             return new Promise((resolve) => {
                 const div = document.createElement('div');
                 div.innerHTML = html;
@@ -730,16 +632,16 @@
                 
                 if (imgs.length === 0) return resolve(html);
 
-                let processed = 0;
+                let done = 0;
                 imgs.forEach(img => {
                     const canvas = document.createElement('canvas');
                     const ctx = canvas.getContext('2d');
                     const image = new Image();
-                    
+
                     image.onload = () => {
                         let width = image.width;
                         let height = image.height;
-                        const maxDim = 1200;
+                        const maxDim = 800; // Reducir escala para velocidad y ahorro de espacio
 
                         if (width > maxDim || height > maxDim) {
                             if (width > height) {
@@ -753,25 +655,81 @@
 
                         canvas.width = width;
                         canvas.height = height;
-                        
-                        ctx.imageSmoothingEnabled = true;
-                        ctx.imageSmoothingQuality = 'high';
                         ctx.drawImage(image, 0, 0, width, height);
+                        img.src = canvas.toDataURL('image/jpeg', 0.6); // Compresión eficiente al 60%
 
-                        img.src = canvas.toDataURL('image/jpeg', 0.92);
-
-                        processed++;
-                        if (processed === imgs.length) resolve(div.innerHTML);
+                        done++;
+                        if (done === imgs.length) resolve(div.innerHTML);
                     };
 
                     image.onerror = () => {
-                        processed++;
-                        if (processed === imgs.length) resolve(div.innerHTML);
+                        done++;
+                        if (done === imgs.length) resolve(div.innerHTML);
                     };
 
                     image.src = img.src;
                 });
             });
+        }
+
+        async function processWordFiles(e) {
+            const files = Array.from(e.target.files);
+            if (!files.length) return;
+
+            const uploadType = document.querySelector('input[name="uploadType"]:checked').value;
+            showLoading(`Iniciando procesamiento de ${files.length} archivo(s)...`);
+
+            for (let i = 0; i < files.length; i++) {
+                const file = files[i];
+                showLoading(`Procesando (${i + 1}/${files.length}): ${file.name}`);
+
+                try {
+                    const arrayBuffer = await file.arrayBuffer();
+                    const result = await mammoth.convertToHtml({ arrayBuffer: arrayBuffer });
+                    
+                    let htmlContent = result.value;
+                    htmlContent = await compressImages(htmlContent);
+
+                    const cleanTitle = file.name.replace(/\.[^/.]+$/, "").toUpperCase();
+
+                    // Guardar directamente en Firebase
+                    await db.collection(COLLECTION).add({
+                        type: uploadType,
+                        title: cleanTitle,
+                        htmlContent: htmlContent,
+                        createdAt: firebase.firestore.FieldValue.serverTimestamp()
+                    });
+
+                } catch (err) {
+                    console.error("Error al procesar: " + file.name, err);
+                }
+            }
+
+            hideLoading();
+            e.target.value = '';
+            switchTab(uploadType === 'PROVEEDOR' ? 'vis-prov-tab' : 'vis-int-tab');
+        }
+
+        function downloadWordFile(id) {
+            const item = currentManuals.find(m => m.id === id);
+            if (!item) return;
+
+            let fileContentHtml = `
+                <html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/TR/REC-html40'>
+                <head><meta charset='utf-8'><title>${item.title}</title></head>
+                <body><h2>${item.title}</h2><hr/>${item.htmlContent || ''}</body>
+                </html>
+            `;
+
+            const blob = new Blob(['\ufeff', fileContentHtml], { type: 'application/msword' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `${item.title}.doc`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
         }
 
         function viewFullManual(id) {
@@ -782,7 +740,6 @@
             document.getElementById('modalFullContent').innerHTML = item.htmlContent || '<p>Sin contenido.</p>';
 
             const modalDownloadBtn = document.getElementById('modalDownloadBtn');
-            modalDownloadBtn.style.display = 'inline-block';
             modalDownloadBtn.onclick = () => downloadWordFile(id);
 
             const modal = new bootstrap.Modal(document.getElementById('viewModal'));
@@ -835,7 +792,7 @@
             if (!title) return;
 
             showLoading("Guardando cambios...");
-            htmlContent = await optimizeHtmlImagesHD(htmlContent);
+            htmlContent = await compressImages(htmlContent);
 
             if (selectedId === 'NEW') {
                 await db.collection(COLLECTION).add({
@@ -864,8 +821,8 @@
         }
 
         async function clearAllData() {
-            if (confirm("ATENCIÓN: Se eliminarán todos los manuales de la plataforma. ¿Continuar?")) {
-                showLoading("Limpiando registros...");
+            if (confirm("ATENCIÓN: Se eliminarán todos los manuales de la base de datos de manera irreversible. ¿Continuar?")) {
+                showLoading("Eliminando registros...");
                 const snapshot = await db.collection(COLLECTION).get();
                 const batch = db.batch();
                 snapshot.docs.forEach(doc => {
@@ -910,31 +867,6 @@
 
         function execCmd(command, value = null) {
             document.execCommand(command, false, value);
-        }
-
-        function triggerEditorImageUpload() {
-            document.getElementById('editorImgInput').click();
-        }
-
-        function insertImageIntoEditor(e) {
-            const file = e.target.files[0];
-            if (!file) return;
-
-            const reader = new FileReader();
-            reader.onload = function(evt) {
-                execCmd('insertImage', evt.target.result);
-            };
-            reader.readAsDataURL(file);
-            e.target.value = '';
-        }
-
-        function printModalContent() {
-            const content = document.getElementById('modalFullContent').innerHTML;
-            const title = document.getElementById('modalTitle').innerText;
-            const printWin = window.open('', '', 'width=900,height=700');
-            printWin.document.write(`<html><head><title>${title}</title><style>body{font-family:Arial;padding:20px;}img{max-width:100%;}</style></head><body><h2>${title}</h2><hr>${content}</body></html>`);
-            printWin.document.close();
-            printWin.print();
         }
     </script>
 </body>
