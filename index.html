@@ -3,354 +3,391 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Enterprise Portal - Manuales Corporativos</title>
+    <title>Manuales Corporativos</title>
     <!-- Bootstrap 5.3 -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <!-- Font Awesome Pro icons -->
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
-    <!-- Mammoth JS -->
+    <!-- Mammoth JS para convertir .docx en HTML -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.6.0/mammoth.browser.min.js"></script>
     <style>
         :root {
-            /* PALETA ANTI-FATIGA VISUAL (MÁXIMO 4 COLORES BASE) */
-            --bg-body: #f8f9fa;           /* 1. Blanco Cálido / Marfil Suave (Fondo General) */
-            --bg-accent: #f1f5f9;         /* Gris/Azul Térmico para Tablas y Modales */
-            --bg-card: #ffffff;           /* Blanco Puro (Tarjetas) */
+            /* PALETA DE COLORES ACTUALIZADA */
+            --header-blue: #0d47a1;         /* Azul oscuro corporativo para la barra superior */
+            --blue-primary: #1565c0;        /* Azul principal para acentos, pestaña activa y bordes */
+            --blue-hover: #0d47a1;          /* Azul más oscuro para efecto hover */
             
-            --primary-brand: #2563eb;     /* 2. Azul Corporativo Ergonomizado (Estructura/Botones) */
-            --primary-brand-hover: #1d4ed8;
-
-            --neutral-slate: #475569;     /* 3. Azul Slate Neutro (Sustituto del Mostaza: Bordes/Subtítulos/Iconos) */
-            --neutral-slate-light: #e2e8f0;
-
-            --status-green: #15803d;      /* 4. Verde Salvia / Menta (Estados "Listo") */
-            --status-green-bg: #dcfce7;
-
-            --border-color: #cbd5e1;      /* Bordes de bajo contraste */
-            --text-main: #1e293b;         /* Texto principal carbón suave */
-            --text-muted: #64748b;        /* Texto secundario de baja fatiga */
+            --bg-page: #f4f4f4;            /* Fondo gris claro general */
+            --bg-card: #ffffff;            /* Fondo blanco de contenedores */
+            --bg-table-header: #e9e9e9;    /* Encabezado de tablas */
+            --bg-table-hover: #f9f9f9;
+            
+            --border-light: #dcdcdc;       /* Bordes finos y limpios */
+            --text-dark: #333333;          /* Texto principal */
+            --text-muted: #666666;        /* Etiquetas y textos secundarios */
+            --badge-info: #9ec5d3;         /* Celeste de contadores */
         }
 
         body {
-            background-color: var(--bg-body);
-            color: var(--text-main);
-            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
-            min-height: 100vh;
+            background-color: var(--bg-page);
+            color: var(--text-dark);
+            font-family: Arial, Helvetica, sans-serif;
+            font-size: 13px;
+            margin: 0;
+            padding: 0;
         }
 
-        .navbar-custom {
-            background: #ffffff;
-            border-bottom: 1px solid var(--border-color);
-            box-shadow: 0 2px 8px rgba(0,0,0,0.03);
-        }
-
-        .text-subtitle-custom {
-            color: var(--text-muted) !important;
-        }
-
-        .card-custom {
-            background-color: var(--bg-card);
-            border: 1px solid var(--border-color);
-            border-radius: 12px;
-            box-shadow: 0 4px 12px rgba(30, 41, 59, 0.03);
-        }
-
-        .nav-pills .nav-link {
-            color: var(--text-muted);
-            border-radius: 8px;
-            padding: 10px 18px;
-            font-weight: 500;
-            transition: all 0.2s ease;
-        }
-
-        .nav-pills .nav-link.active {
-            background: var(--primary-brand);
+        /* Top Bar en color AZUL */
+        .top-bar-blue {
+            background-color: var(--header-blue);
             color: #ffffff;
-            border: 1px solid var(--primary-brand-hover);
+            padding: 8px 20px;
+            font-size: 12px;
         }
 
-        .nav-pills .nav-link:hover:not(.active) {
-            background-color: var(--bg-accent);
-            color: var(--text-main);
-        }
-
-        .input-custom {
-            background-color: #ffffff !important;
-            border-color: var(--border-color) !important;
-            color: var(--text-main) !important;
-        }
-
-        .input-custom::placeholder {
-            color: #94a3b8 !important;
-        }
-
-        .table-warm-custom {
-            --bs-table-bg: transparent;
-            --bs-table-color: var(--text-main);
-            --bs-table-border-color: var(--border-color);
-        }
-
-        .table-warm-custom th {
-            text-transform: uppercase;
-            font-size: 0.75rem;
-            letter-spacing: 0.05em;
-            color: var(--neutral-slate);
-            background-color: var(--bg-accent);
-            border-bottom-width: 2px;
-        }
-
-        /* Botones de Acción Unificados */
-        .btn-action-custom {
-            background-color: var(--bg-accent);
-            border: 1px solid var(--border-color);
-            color: var(--neutral-slate);
-            transition: all 0.2s ease;
-        }
-        
-        .btn-action-custom:hover {
-            background-color: var(--primary-brand);
+        .top-bar-blue .logo-text {
+            font-size: 16px;
+            font-weight: bold;
             color: #ffffff;
-            border-color: var(--primary-brand-hover);
+            letter-spacing: -0.5px;
         }
 
-        .btn-action-word {
-            background-color: #e0f2fe;
-            border: 1px solid #bae6fd;
-            color: #0369a1;
-        }
-        .btn-action-word:hover {
-            background-color: var(--primary-brand);
-            color: #ffffff;
-        }
-
-        .manual-view-content {
+        /* Nav Pestañas Principales */
+        .main-navbar {
             background-color: #ffffff;
-            border: 1px solid var(--border-color);
-            border-radius: 8px;
-            padding: 24px;
-            color: var(--text-main);
-            max-height: 65vh;
-            overflow-y: auto;
+            border-bottom: 2px solid var(--border-light);
+            padding: 0 10px;
         }
 
-        .manual-view-content img {
-            max-width: 100% !important;
-            height: auto !important;
-            border-radius: 8px;
-            margin: 16px 0;
-            border: 1px solid var(--border-color);
+        .nav-portalsn {
+            border: none;
+            gap: 0;
         }
 
+        .nav-portalsn .nav-item {
+            border-right: 1px solid var(--border-light);
+        }
+
+        .nav-portalsn .nav-link {
+            color: var(--text-muted);
+            border: none;
+            border-radius: 0;
+            padding: 12px 20px;
+            font-weight: bold;
+            font-size: 12px;
+            text-transform: uppercase;
+            background: transparent;
+            position: relative;
+            transition: color 0.2s ease-in-out;
+        }
+
+        /* Subrayado de pestaña activa en color AZUL */
+        .nav-portalsn .nav-link.active {
+            color: var(--text-dark);
+            background: transparent;
+        }
+
+        .nav-portalsn .nav-link.active::after {
+            content: '';
+            position: absolute;
+            bottom: -2px;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background-color: var(--blue-primary);
+        }
+
+        /* Hover de cabeceras en color AZUL */
+        .nav-portalsn .nav-link:hover:not(.active) {
+            color: var(--blue-primary);
+        }
+
+        /* Tarjetas de Contenido */
+        .content-card {
+            background-color: var(--bg-card);
+            border: 1px solid var(--border-light);
+            border-radius: 0;
+            padding: 20px;
+            margin-top: 15px;
+        }
+
+        .section-title {
+            font-size: 13px;
+            font-weight: normal;
+            color: var(--text-dark);
+            margin-bottom: 12px;
+        }
+
+        /* Form Estilos e Inputs */
+        .form-label-custom {
+            font-size: 11px;
+            font-weight: bold;
+            color: var(--text-dark);
+            margin-bottom: 4px;
+        }
+
+        .input-portalsn {
+            font-size: 12px;
+            border-radius: 2px;
+            border: 1px solid var(--border-light);
+            padding: 5px 8px;
+            background-color: #ffffff;
+        }
+
+        .input-portalsn:focus {
+            border-color: var(--blue-primary);
+            box-shadow: none;
+        }
+
+        /* Tablas */
+        .table-portalsn {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 11px;
+            border: 1px solid var(--border-light);
+        }
+
+        .table-portalsn th {
+            background-color: var(--bg-table-header);
+            color: var(--text-dark);
+            font-weight: bold;
+            padding: 7px 10px;
+            border: 1px solid var(--border-light);
+            text-transform: uppercase;
+        }
+
+        .table-portalsn td {
+            padding: 7px 10px;
+            border: 1px solid var(--border-light);
+            vertical-align: middle;
+            color: var(--text-dark);
+        }
+
+        .table-portalsn tbody tr:hover {
+            background-color: var(--bg-table-hover);
+        }
+
+        /* Botones estilo Azul / Gris */
+        .btn-portalsn-blue {
+            background-color: var(--blue-primary);
+            color: #ffffff;
+            border: none;
+            border-radius: 2px;
+            padding: 5px 15px;
+            font-size: 12px;
+            font-weight: bold;
+        }
+
+        .btn-portalsn-blue:hover {
+            background-color: var(--blue-hover);
+            color: #ffffff;
+        }
+
+        .btn-portalsn-gray {
+            background-color: #f0f0f0;
+            color: var(--text-dark);
+            border: 1px solid var(--border-light);
+            border-radius: 2px;
+            padding: 3px 10px;
+            font-size: 11px;
+            font-weight: bold;
+        }
+
+        .btn-portalsn-gray:hover {
+            background-color: #e0e0e0;
+        }
+
+        /* Insignias */
+        .badge-count {
+            background-color: var(--badge-info);
+            color: #ffffff;
+            font-size: 11px;
+            font-weight: normal;
+            padding: 4px 8px;
+            border-radius: 2px;
+            display: inline-block;
+        }
+
+        /* Insignia de Estado en color AZUL */
+        .badge-status-ok {
+            background-color: #e3f2fd;
+            color: #0d47a1;
+            border: 1px solid #bbdefb;
+            font-weight: bold;
+            font-size: 10px;
+            padding: 2px 6px;
+            border-radius: 2px;
+        }
+
+        /* Editor de Texto */
         .manual-editor {
             background-color: #ffffff;
-            color: var(--text-main);
-            border: 1px solid var(--border-color);
-            border-radius: 8px;
-            padding: 16px;
-            min-height: 350px;
-            max-height: 550px;
+            color: var(--text-dark);
+            border: 1px solid var(--border-light);
+            padding: 12px;
+            min-height: 280px;
+            max-height: 480px;
             overflow-y: auto;
             outline: none;
         }
 
-        .manual-editor img {
-            max-width: 100%;
-            height: auto;
-            border-radius: 6px;
-        }
-
         .editor-toolbar {
-            background-color: var(--bg-accent);
-            border: 1px solid var(--border-color);
+            background-color: var(--bg-table-header);
+            border: 1px solid var(--border-light);
             border-bottom: none;
-            border-radius: 8px 8px 0 0;
-            padding: 8px;
+            padding: 5px;
             display: flex;
-            gap: 6px;
-            flex-wrap: wrap;
+            gap: 4px;
         }
 
         .editor-toolbar button {
             background: #ffffff;
-            border: 1px solid var(--border-color);
-            color: var(--neutral-slate);
-            border-radius: 4px;
-            padding: 4px 10px;
-            font-size: 0.85rem;
+            border: 1px solid var(--border-light);
+            color: var(--text-dark);
+            border-radius: 2px;
+            padding: 2px 8px;
+            font-size: 11px;
         }
 
         .editor-toolbar button:hover {
-            background: var(--primary-brand);
+            background: var(--blue-primary);
             color: white;
         }
 
-        /* Unificación de Badges */
-        .badge-type-custom {
-            background: var(--neutral-slate-light);
-            color: var(--neutral-slate);
-            border: 1px solid var(--border-color);
-        }
-
-        .badge-status-ready {
-            background: var(--status-green-bg);
-            color: var(--status-green);
-            border: 1px solid #a7f3d0;
-        }
-
-        .btn-custom-brand {
-            background-color: var(--primary-brand);
-            color: #ffffff;
-            border: 1px solid var(--primary-brand-hover);
-        }
-
-        .btn-custom-brand:hover {
-            background-color: var(--primary-brand-hover);
-            color: #ffffff;
-        }
-
         ::-webkit-scrollbar {
-            width: 8px;
-            height: 8px;
+            width: 6px;
+            height: 6px;
         }
         ::-webkit-scrollbar-track {
-            background: var(--bg-body);
+            background: var(--bg-page);
         }
         ::-webkit-scrollbar-thumb {
-            background: #cbd5e1;
-            border-radius: 4px;
-        }
-        ::-webkit-scrollbar-thumb:hover {
-            background: #94a3b8;
+            background: #cccccc;
         }
     </style>
 </head>
 <body>
 
-    <!-- Header / Navbar -->
-    <nav class="navbar navbar-expand-lg navbar-custom sticky-top py-3">
-        <div class="container-fluid px-4">
-            <a class="navbar-brand d-flex align-items-center gap-3" href="#">
-                <div class="p-2 rounded-3 text-white" style="background-color: var(--primary-brand);">
-                    <i class="fa-solid fa-layer-group fa-lg"></i>
-                </div>
-                <div>
-                    <span class="fw-bold fs-5 d-block" style="color: var(--text-main);">Enterprise Manuals Platform</span>
-                    <small class="text-subtitle-custom fs-7">Gestión de Documentación y Procedimientos Corporativos</small>
-                </div>
-            </a>
-            <button class="btn btn-outline-secondary btn-sm rounded-pill px-3" onclick="shareCurrentState()">
-                <i class="fa-solid fa-share-nodes me-2"></i>Exportar Estado
+    <!-- Cabecera Superior en color AZUL -->
+    <div class="top-bar-blue d-flex justify-content-between align-items-center">
+        <div class="d-flex align-items-center gap-2">
+            <i class="fa-solid fa-book-open text-white me-1"></i>
+            <span class="logo-text">SISTEMA DE MANUALES Y PROCEDIMIENTOS</span>
+        </div>
+        <div class="d-flex align-items-center gap-2" style="font-size: 11px;">
+            <button class="btn btn-sm text-white p-0 border-0" title="Ir a Pestaña Carga" onclick="switchTab('carga-tab')">
+                <i class="fa-solid fa-cloud-arrow-up me-1"></i>Carga Masiva
+            </button>
+            <span class="text-white-50">|</span>
+            <button class="btn btn-sm text-white p-0 border-0" title="Vaciar Base de Datos" onclick="clearAllData()">
+                <i class="fa-solid fa-rotate-left me-1"></i>Reiniciar
             </button>
         </div>
-    </nav>
+    </div>
 
-    <!-- Main Workspace -->
-    <div class="container-fluid px-4 py-4">
-        
-        <!-- Navigation Tabs -->
-        <ul class="nav nav-pills justify-content-center mb-4 gap-2 card-custom p-2" id="mainTabs" role="tablist">
+    <!-- Navegación de Pestañas con Indicador y Hover AZUL -->
+    <div class="main-navbar">
+        <ul class="nav nav-portalsn d-flex justify-content-start" id="mainTabs" role="tablist">
             <li class="nav-item">
-                <button class="nav-link active" id="vis-prov-tab" data-bs-toggle="pill" data-bs-target="#vis-prov" type="button">
-                    <i class="fa-solid fa-building-circle-check me-2"></i>Vis. Manual Proveedores
+                <button class="nav-link active" id="vis-prov-tab" data-bs-toggle="tab" data-bs-target="#vis-prov" type="button">
+                    Vis. Manual Proveedores
                 </button>
             </li>
             <li class="nav-item">
-                <button class="nav-link" id="mod-prov-tab" data-bs-toggle="pill" data-bs-target="#mod-prov" type="button">
-                    <i class="fa-solid fa-pen-to-square me-2"></i>Mod. Manual Proveedores
+                <button class="nav-link" id="mod-prov-tab" data-bs-toggle="tab" data-bs-target="#mod-prov" type="button">
+                    Mod. Manual Proveedores
                 </button>
             </li>
             <li class="nav-item">
-                <button class="nav-link" id="vis-int-tab" data-bs-toggle="pill" data-bs-target="#vis-int" type="button">
-                    <i class="fa-solid fa-folder-tree me-2"></i>Vis. Manual Interno
+                <button class="nav-link" id="vis-int-tab" data-bs-toggle="tab" data-bs-target="#vis-int" type="button">
+                    Vis. Manual Interno
                 </button>
             </li>
             <li class="nav-item">
-                <button class="nav-link" id="mod-int-tab" data-bs-toggle="pill" data-bs-target="#mod-int" type="button">
-                    <i class="fa-solid fa-file-pen me-2"></i>Mod. Manual Interno
+                <button class="nav-link" id="mod-int-tab" data-bs-toggle="tab" data-bs-target="#mod-int" type="button">
+                    Mod. Manual Interno
                 </button>
             </li>
             <li class="nav-item">
-                <button class="nav-link" id="carga-tab" data-bs-toggle="pill" data-bs-target="#carga" type="button">
-                    <i class="fa-solid fa-cloud-arrow-up me-2"></i>Carga Masiva (.docx)
+                <button class="nav-link" id="carga-tab" data-bs-toggle="tab" data-bs-target="#carga" type="button">
+                    Carga Masiva (.docx)
                 </button>
             </li>
             <li class="nav-item">
-                <button class="nav-link" id="admin-tab" data-bs-toggle="pill" data-bs-target="#admin" type="button">
-                    <i class="fa-solid fa-sliders me-2"></i>Administración General
+                <button class="nav-link" id="admin-tab" data-bs-toggle="tab" data-bs-target="#admin" type="button">
+                    Administración
                 </button>
             </li>
         </ul>
+    </div>
 
-        <!-- Tab Content -->
+    <!-- Contenido Principal -->
+    <div class="container-fluid px-4 py-3">
         <div class="tab-content" id="mainTabsContent">
             
-            <!-- Vis. Manual Proveedor -->
+            <!-- Vis. Manual Proveedores -->
             <div class="tab-pane fade show active" id="vis-prov" role="tabpanel">
-                <div class="card card-custom p-4">
-                    <div class="row align-items-center mb-4 g-3">
-                        <div class="col-md-6">
-                            <h2 class="h5 fw-bold mb-0" style="color: var(--text-main);"><i class="fa-solid fa-building me-2" style="color: var(--primary-brand);"></i>Directorio de Manuales de Proveedores</h2>
+                <div class="section-title">Seleccione la Orden o Razón Social que desea consultar:</div>
+                
+                <div class="content-card">
+                    <div class="row align-items-end mb-3 g-2">
+                        <div class="col-md-5">
+                            <label class="form-label-custom">Seleccione Razón Social / Proveedor</label>
+                            <input type="text" id="searchProvInput" class="form-control input-portalsn" list="provOptions" placeholder="- Escriba o seleccione -" oninput="filterManuals('PROVEEDOR')">
+                            <datalist id="provOptions"></datalist>
                         </div>
-                        <div class="col-md-6">
-                            <div class="input-group">
-                                <span class="input-group-text input-custom border-end-0 text-subtitle-custom"><i class="fa-solid fa-magnifying-glass"></i></span>
-                                <input type="text" id="searchProvInput" class="form-control input-custom border-start-0" list="provOptions" placeholder="Seleccione o busque Razón Social / Proveedor..." oninput="filterManuals('PROVEEDOR')">
-                                <datalist id="provOptions"></datalist>
-                            </div>
+                        <div class="col-md-3">
+                            <span id="provCountBadge" class="badge-count"><i class="fa-solid fa-magnifying-glass me-1"></i>Buscando registros...</span>
                         </div>
                     </div>
-                    <div class="table-responsive">
-                        <table class="table table-warm-custom align-middle">
-                            <thead>
-                                <tr>
-                                    <th>TIPO</th>
-                                    <th>RAZÓN SOCIAL / NOMBRE</th>
-                                    <th>ESTADO</th>
-                                    <th class="text-end">ACCIONES</th>
-                                </tr>
-                            </thead>
-                            <tbody id="tableProv"></tbody>
-                        </table>
-                    </div>
+
+                    <table class="table-portalsn">
+                        <thead>
+                            <tr>
+                                <th>TIPO DOCUMENTO</th>
+                                <th>RAZÓN SOCIAL / NOMBRE PROVEEDOR</th>
+                                <th>ESTADO</th>
+                                <th class="text-end">ACCIONES</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tableProv"></tbody>
+                    </table>
                 </div>
             </div>
 
-            <!-- Mod. Manual Proveedor -->
+            <!-- Mod. Manual Proveedores -->
             <div class="tab-pane fade" id="mod-prov" role="tabpanel">
-                <div class="card card-custom p-4">
-                    <h2 class="h5 fw-bold mb-3" style="color: var(--text-main);"><i class="fa-solid fa-pen-to-square me-2" style="color: var(--primary-brand);"></i>Editor de Manual de Proveedor</h2>
+                <div class="section-title">Edición y Registro de Manuales de Proveedores:</div>
+                <div class="content-card">
                     <form onsubmit="saveManualEditor(event, 'PROVEEDOR')">
                         <div class="row g-3 mb-3">
                             <div class="col-md-6">
-                                <label class="form-label text-subtitle-custom">Seleccionar Manual a Editar (o Crear Nuevo)</label>
-                                <select id="provSelectManual" class="form-select input-custom" onchange="loadManualIntoEditor('PROVEEDOR')">
-                                    <option value="NEW">-- Crear Nuevo Manual desde Cero --</option>
+                                <label class="form-label-custom">Seleccionar Documento Existente</label>
+                                <select id="provSelectManual" class="form-select input-portalsn" onchange="loadManualIntoEditor('PROVEEDOR')">
+                                    <option value="NEW">-- Crear Nuevo Registro --</option>
                                 </select>
                             </div>
                             <div class="col-md-6">
-                                <label class="form-label text-subtitle-custom">Razón Social / Nombre del Proveedor</label>
-                                <input type="text" id="provTitleEdit" class="form-control input-custom" placeholder="Ej: APM TERMINALS CALLAO S.A." required>
+                                <label class="form-label-custom">Razón Social / Nombre <span class="text-danger">*</span></label>
+                                <input type="text" id="provTitleEdit" class="form-control input-portalsn" placeholder="Ej: CGM RENTAL S.A.C" required>
                             </div>
                         </div>
 
                         <div class="mb-3">
-                            <label class="form-label text-subtitle-custom">Contenido Íntegro y Procedimiento</label>
+                            <label class="form-label-custom">Contenido del Manual</label>
                             <div class="editor-toolbar">
-                                <button type="button" onclick="execCmd('bold')"><i class="fa-solid fa-bold"></i></button>
-                                <button type="button" onclick="execCmd('italic')"><i class="fa-solid fa-italic"></i></button>
-                                <button type="button" onclick="execCmd('underline')"><i class="fa-solid fa-underline"></i></button>
+                                <button type="button" onclick="execCmd('bold')"><b>B</b></button>
+                                <button type="button" onclick="execCmd('italic')"><i>I</i></button>
+                                <button type="button" onclick="execCmd('underline')"><u>U</u></button>
                                 <button type="button" onclick="execCmd('insertUnorderedList')"><i class="fa-solid fa-list-ul"></i></button>
                                 <button type="button" onclick="execCmd('insertOrderedList')"><i class="fa-solid fa-list-ol"></i></button>
-                                <button type="button" onclick="execCmd('justifyLeft')"><i class="fa-solid fa-align-left"></i></button>
-                                <button type="button" onclick="execCmd('justifyCenter')"><i class="fa-solid fa-align-center"></i></button>
-                                <button type="button" onclick="execCmd('justifyRight')"><i class="fa-solid fa-align-right"></i></button>
-                                <button type="button" onclick="triggerEditorImageUpload('provEditor')"><i class="fa-solid fa-image me-1"></i>Insertar Imagen</button>
+                                <button type="button" onclick="triggerEditorImageUpload()"><i class="fa-solid fa-image me-1"></i>Imagen</button>
                             </div>
                             <div id="provEditor" class="manual-editor" contenteditable="true"></div>
                         </div>
 
                         <div class="d-flex justify-content-end gap-2">
-                            <button type="submit" class="btn btn-custom-brand px-4"><i class="fa-solid fa-floppy-disk me-2"></i>Guardar Cambios en Manual</button>
+                            <button type="submit" class="btn-portalsn-blue"><i class="fa-solid fa-floppy-disk me-1"></i>Guardar Cambios</button>
                         </div>
                     </form>
                 </div>
@@ -358,71 +395,63 @@
 
             <!-- Vis. Manual Interno -->
             <div class="tab-pane fade" id="vis-int" role="tabpanel">
-                <div class="card card-custom p-4">
-                    <div class="row align-items-center mb-4 g-3">
-                        <div class="col-md-6">
-                            <h2 class="h5 fw-bold mb-0" style="color: var(--text-main);"><i class="fa-solid fa-folder-tree me-2" style="color: var(--primary-brand);"></i>Directorio de Manuales Internos</h2>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="input-group">
-                                <span class="input-group-text input-custom border-end-0 text-subtitle-custom"><i class="fa-solid fa-magnifying-glass"></i></span>
-                                <input type="text" id="searchIntInput" class="form-control input-custom border-start-0" list="intOptions" placeholder="Seleccione o busque proceso interno..." oninput="filterManuals('INTERNO')">
-                                <datalist id="intOptions"></datalist>
-                            </div>
+                <div class="section-title">Seleccione el Proceso Interno que desea consultar:</div>
+                <div class="content-card">
+                    <div class="row align-items-end mb-3 g-2">
+                        <div class="col-md-5">
+                            <label class="form-label-custom">Seleccione Proceso Interno</label>
+                            <input type="text" id="searchIntInput" class="form-control input-portalsn" list="intOptions" placeholder="- Escriba o seleccione -" oninput="filterManuals('INTERNO')">
+                            <datalist id="intOptions"></datalist>
                         </div>
                     </div>
-                    <div class="table-responsive">
-                        <table class="table table-warm-custom align-middle">
-                            <thead>
-                                <tr>
-                                    <th>TIPO</th>
-                                    <th>NOMBRE DEL MANUAL / PROCESO</th>
-                                    <th>ESTADO</th>
-                                    <th class="text-end">ACCIONES</th>
-                                </tr>
-                            </thead>
-                            <tbody id="tableInt"></tbody>
-                        </table>
-                    </div>
+
+                    <table class="table-portalsn">
+                        <thead>
+                            <tr>
+                                <th>TIPO DOCUMENTO</th>
+                                <th>NOMBRE DEL MANUAL / PROCESO</th>
+                                <th>ESTADO</th>
+                                <th class="text-end">ACCIONES</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tableInt"></tbody>
+                    </table>
                 </div>
             </div>
 
             <!-- Mod. Manual Interno -->
             <div class="tab-pane fade" id="mod-int" role="tabpanel">
-                <div class="card card-custom p-4">
-                    <h2 class="h5 fw-bold mb-3" style="color: var(--text-main);"><i class="fa-solid fa-file-pen me-2" style="color: var(--primary-brand);"></i>Editor de Manual Interno</h2>
+                <div class="section-title">Edición y Registro de Manuales Internos:</div>
+                <div class="content-card">
                     <form onsubmit="saveManualEditor(event, 'INTERNO')">
                         <div class="row g-3 mb-3">
                             <div class="col-md-6">
-                                <label class="form-label text-subtitle-custom">Seleccionar Manual Interno a Editar</label>
-                                <select id="intSelectManual" class="form-select input-custom" onchange="loadManualIntoEditor('INTERNO')">
-                                    <option value="NEW">-- Crear Nuevo Manual Interno desde Cero --</option>
+                                <label class="form-label-custom">Seleccionar Manual Interno</label>
+                                <select id="intSelectManual" class="form-select input-portalsn" onchange="loadManualIntoEditor('INTERNO')">
+                                    <option value="NEW">-- Crear Nuevo Registro --</option>
                                 </select>
                             </div>
                             <div class="col-md-6">
-                                <label class="form-label text-subtitle-custom">Nombre del Proceso Interno</label>
-                                <input type="text" id="intTitleEdit" class="form-control input-custom" placeholder="Ej: Solicitud de Requerimientos Internos" required>
+                                <label class="form-label-custom">Nombre del Proceso <span class="text-danger">*</span></label>
+                                <input type="text" id="intTitleEdit" class="form-control input-portalsn" placeholder="Ej: FACTURACION REPUESTOS" required>
                             </div>
                         </div>
 
                         <div class="mb-3">
-                            <label class="form-label text-subtitle-custom">Contenido Íntegro del Manual</label>
+                            <label class="form-label-custom">Contenido del Manual</label>
                             <div class="editor-toolbar">
-                                <button type="button" onclick="execCmd('bold')"><i class="fa-solid fa-bold"></i></button>
-                                <button type="button" onclick="execCmd('italic')"><i class="fa-solid fa-italic"></i></button>
-                                <button type="button" onclick="execCmd('underline')"><i class="fa-solid fa-underline"></i></button>
+                                <button type="button" onclick="execCmd('bold')"><b>B</b></button>
+                                <button type="button" onclick="execCmd('italic')"><i>I</i></button>
+                                <button type="button" onclick="execCmd('underline')"><u>U</u></button>
                                 <button type="button" onclick="execCmd('insertUnorderedList')"><i class="fa-solid fa-list-ul"></i></button>
                                 <button type="button" onclick="execCmd('insertOrderedList')"><i class="fa-solid fa-list-ol"></i></button>
-                                <button type="button" onclick="execCmd('justifyLeft')"><i class="fa-solid fa-align-left"></i></button>
-                                <button type="button" onclick="execCmd('justifyCenter')"><i class="fa-solid fa-align-center"></i></button>
-                                <button type="button" onclick="execCmd('justifyRight')"><i class="fa-solid fa-align-right"></i></button>
-                                <button type="button" onclick="triggerEditorImageUpload('intEditor')"><i class="fa-solid fa-image me-1"></i>Insertar Imagen</button>
+                                <button type="button" onclick="triggerEditorImageUpload()"><i class="fa-solid fa-image me-1"></i>Imagen</button>
                             </div>
                             <div id="intEditor" class="manual-editor" contenteditable="true"></div>
                         </div>
 
                         <div class="d-flex justify-content-end gap-2">
-                            <button type="submit" class="btn btn-custom-brand px-4"><i class="fa-solid fa-floppy-disk me-2"></i>Guardar Cambios en Manual</button>
+                            <button type="submit" class="btn-portalsn-blue"><i class="fa-solid fa-floppy-disk me-1"></i>Guardar Cambios</button>
                         </div>
                     </form>
                 </div>
@@ -430,50 +459,41 @@
 
             <!-- Carga Masiva (.docx) -->
             <div class="tab-pane fade" id="carga" role="tabpanel">
-                <div class="card card-custom p-5 text-center">
-                    <div class="border border-2 border-dashed border-secondary-subtle rounded-4 p-5" style="background-color: #ffffff;">
-                        <i class="fa-solid fa-file-word fa-4x mb-3" style="color: var(--primary-brand);"></i>
-                        <h4 class="fw-bold" style="color: var(--text-main);">Importador Automático de Documentos (.docx)</h4>
-                        <p class="text-subtitle-custom mb-4">Cargue sus archivos Word. El sistema almacenará el Word original para descarga ilimitada y extraerá la vista previa.</p>
-                        
-                        <div class="d-flex justify-content-center gap-3 mb-4">
-                            <div class="form-check text-start">
-                                <input class="form-check-input" type="radio" name="uploadType" id="typeProv" value="PROVEEDOR" checked>
-                                <label class="form-check-label" style="color: var(--text-main);" for="typeProv">Cargar como Manual de Proveedor</label>
-                            </div>
-                            <div class="form-check text-start">
-                                <input class="form-check-input" type="radio" name="uploadType" id="typeInt" value="INTERNO">
-                                <label class="form-check-label" style="color: var(--text-main);" for="typeInt">Cargar como Manual Interno</label>
-                            </div>
-                        </div>
+                <div class="section-title">Carga Masiva de Archivos (.docx):</div>
+                <div class="content-card text-center py-5">
+                    <i class="fa-solid fa-file-arrow-up fa-3x text-muted mb-3"></i>
+                    <h6>Importador de Documentos Word</h6>
+                    <p class="text-muted small mb-4">Seleccione la categoría e importe sus archivos Word directamente a la aplicación.</p>
 
-                        <input type="file" id="fileUpload" class="d-none" multiple accept=".docx" onchange="processWordFiles(event)">
-                        <button class="btn btn-custom-brand btn-lg px-5 rounded-pill shadow-sm" onclick="document.getElementById('fileUpload').click()">
-                            <i class="fa-solid fa-folder-open me-2"></i>Seleccionar Archivos Word (.docx)
-                        </button>
+                    <div class="d-flex justify-content-center gap-4 mb-4">
+                        <label class="form-check-label"><input type="radio" name="uploadType" value="PROVEEDOR" checked> Manual Proveedores</label>
+                        <label class="form-check-label"><input type="radio" name="uploadType" value="INTERNO"> Manual Interno</label>
                     </div>
+
+                    <input type="file" id="fileUpload" class="d-none" multiple accept=".docx" onchange="processWordFiles(event)">
+                    <button class="btn-portalsn-blue px-4 py-2" onclick="document.getElementById('fileUpload').click()">
+                        <i class="fa-solid fa-folder-open me-2"></i>Examinar Archivos .docx
+                    </button>
                 </div>
             </div>
 
-            <!-- Administración General -->
+            <!-- Administración -->
             <div class="tab-pane fade" id="admin" role="tabpanel">
-                <div class="card card-custom p-4">
-                    <div class="d-flex justify-content-between align-items-center mb-4">
-                        <h2 class="h5 fw-bold mb-0" style="color: var(--text-main);"><i class="fa-solid fa-sliders me-2" style="color: var(--primary-brand);"></i>Administración Consolidada de Manuales</h2>
-                        <button class="btn btn-outline-secondary btn-sm" onclick="clearAllData()"><i class="fa-solid fa-trash-can me-1"></i>Eliminar Todos los Documentos</button>
-                    </div>
-                    <div class="table-responsive">
-                        <table class="table table-warm-custom align-middle">
-                            <thead>
-                                <tr>
-                                    <th>TIPO</th>
-                                    <th>NOMBRE DEL MANUAL</th>
-                                    <th>ESTADO</th>
-                                    <th class="text-end">ACCIONES</th>
-                                </tr>
-                            </thead>
-                            <tbody id="tableAdmin"></tbody>
-                        </table>
+                <div class="section-title">Consola de Administración de Documentos:</div>
+                <div class="content-card">
+                    <table class="table-portalsn mb-3">
+                        <thead>
+                            <tr>
+                                <th>TIPO</th>
+                                <th>NOMBRE DEL DOCUMENTO</th>
+                                <th>ESTADO</th>
+                                <th class="text-end">ACCIONES</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tableAdmin"></tbody>
+                    </table>
+                    <div class="text-end">
+                        <button class="btn-portalsn-gray" onclick="clearAllData()"><i class="fa-solid fa-trash me-1"></i>Vaciar Base de Datos</button>
                     </div>
                 </div>
             </div>
@@ -481,29 +501,26 @@
         </div>
     </div>
 
-    <!-- Hidden file input para imágenes en editor -->
+    <!-- Hidden file input para insertar imagen en editor -->
     <input type="file" id="editorImgInput" accept="image/*" class="d-none" onchange="insertImageIntoEditor(event)">
 
-    <!-- Modal Visualizador Completo del Documento -->
+    <!-- Modal Visualizador -->
     <div class="modal fade" id="viewModal" tabindex="-1" aria-hidden="true">
-        <div class="modal-dialog modal-xl modal-dialog-scrollable">
-            <div class="modal-content" style="background-color: var(--bg-card); border-color: var(--border-color);">
-                <div class="modal-header" style="border-color: var(--border-color);">
-                    <div>
-                        <span id="modalBadge" class="badge badge-type-custom mb-1"></span>
-                        <h5 class="modal-title fw-bold" id="modalTitle" style="color: var(--primary-brand);"></h5>
-                    </div>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        <div class="modal-dialog modal-xl">
+            <div class="modal-content" style="border-radius: 0;">
+                <div class="modal-header py-2" style="background-color: var(--header-blue); color: #ffffff;">
+                    <h6 class="modal-title fw-bold" id="modalTitle"></h6>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
-                <div class="modal-body">
-                    <div id="modalFullContent" class="manual-view-content"></div>
+                <div class="modal-body p-4">
+                    <div id="modalFullContent" style="font-size: 13px; line-height: 1.5;"></div>
                 </div>
-                <div class="modal-footer" style="border-color: var(--border-color);">
-                    <button type="button" id="modalDownloadBtn" class="btn btn-custom-brand">
-                        <i class="fa-solid fa-file-word me-1"></i>Descargar Word Original
+                <div class="modal-footer py-2" style="background-color: var(--bg-table-header);">
+                    <button type="button" id="modalDownloadBtn" class="btn-portalsn-blue">
+                        <i class="fa-solid fa-file-word me-1"></i>Descargar Word
                     </button>
-                    <button type="button" class="btn btn-outline-secondary" onclick="printModalContent()"><i class="fa-solid fa-print me-1"></i>Imprimir / PDF</button>
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                    <button type="button" class="btn-portalsn-gray" onclick="printModalContent()"><i class="fa-solid fa-print me-1"></i>Imprimir</button>
+                    <button type="button" class="btn-portalsn-gray" data-bs-dismiss="modal">Cerrar</button>
                 </div>
             </div>
         </div>
@@ -594,33 +611,36 @@
             provDatalist.innerHTML = '';
             intDatalist.innerHTML = '';
 
-            provSelectManual.innerHTML = '<option value="NEW">-- Crear Nuevo Manual desde Cero --</option>';
-            intSelectManual.innerHTML = '<option value="NEW">-- Crear Nuevo Manual Interno desde Cero --</option>';
+            provSelectManual.innerHTML = '<option value="NEW">-- Crear Nuevo Registro --</option>';
+            intSelectManual.innerHTML = '<option value="NEW">-- Crear Nuevo Registro --</option>';
+
+            let provCount = 0;
 
             data.forEach(item => {
                 const isProv = item.type === 'PROVEEDOR';
+                if (isProv) provCount++;
+
                 const hasFile = !!item.fileData;
-                
                 const downloadBtnHtml = hasFile ? 
-                    `<button class="btn btn-action-word btn-sm me-1" title="Descargar Word (.docx)" onclick="downloadOriginalWord('${item.id}')">
-                        <i class="fa-solid fa-file-word"></i>
+                    `<button class="btn-portalsn-gray py-0 px-2 me-1" title="Descargar Word" onclick="downloadOriginalWord('${item.id}')">
+                        <i class="fa-solid fa-file-word text-primary"></i>
                      </button>` : '';
 
                 const rowHtml = `
                     <tr>
-                        <td><span class="badge badge-type-custom">${item.type}</span></td>
-                        <td class="fw-semibold" style="color: var(--text-main);">${item.title}</td>
-                        <td><span class="badge badge-status-ready"><i class="fa-solid fa-check me-1"></i>Listo</span></td>
+                        <td><b>${item.type}</b></td>
+                        <td>${item.title}</td>
+                        <td><span class="badge-status-ok">DISPONIBLE</span></td>
                         <td class="text-end">
-                            <button class="btn btn-action-custom btn-sm me-1" onclick="viewFullManual('${item.id}')">
-                                <i class="fa-solid fa-eye me-1"></i>Visualizar
+                            <button class="btn-portalsn-gray py-0 px-2 me-1" onclick="viewFullManual('${item.id}')">
+                                <i class="fa-solid fa-eye me-1"></i>Ver
                             </button>
                             ${downloadBtnHtml}
-                            <button class="btn btn-action-custom btn-sm me-1" title="Editar en Portal" onclick="openInEditor('${item.id}')">
+                            <button class="btn-portalsn-gray py-0 px-2 me-1" onclick="openInEditor('${item.id}')">
                                 <i class="fa-solid fa-pen"></i>
                             </button>
-                            <button class="btn btn-action-custom btn-sm" title="Eliminar" onclick="deleteManual('${item.id}')">
-                                <i class="fa-solid fa-trash"></i>
+                            <button class="btn-portalsn-gray py-0 px-2" onclick="deleteManual('${item.id}')">
+                                <i class="fa-solid fa-trash text-danger"></i>
                             </button>
                         </td>
                     </tr>
@@ -637,6 +657,8 @@
                 }
                 tableAdmin.innerHTML += rowHtml;
             });
+
+            document.getElementById('provCountBadge').innerHTML = `<i class="fa-solid fa-magnifying-glass me-1"></i>Se encontraron ${provCount} registros`;
         }
 
         async function viewFullManual(id) {
@@ -644,11 +666,8 @@
             const item = data.find(m => m.id === id);
             if (!item) return;
 
-            document.getElementById('modalTitle').innerText = item.title;
-            const modalBadge = document.getElementById('modalBadge');
-            modalBadge.innerText = item.type;
-
-            document.getElementById('modalFullContent').innerHTML = item.htmlContent || '<p>Sin contenido cargado.</p>';
+            document.getElementById('modalTitle').innerText = item.title + " (" + item.type + ")";
+            document.getElementById('modalFullContent').innerHTML = item.htmlContent || '<p>Sin contenido.</p>';
 
             const modalDownloadBtn = document.getElementById('modalDownloadBtn');
             if (item.fileData) {
@@ -665,10 +684,7 @@
         async function downloadOriginalWord(id) {
             const data = await getAllManuals();
             const item = data.find(m => m.id === id);
-            if (!item || !item.fileData) {
-                alert('Este documento no posee archivo Word adjunto.');
-                return;
-            }
+            if (!item || !item.fileData) return;
 
             const blob = new Blob([item.fileData], { type: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document' });
             const url = URL.createObjectURL(blob);
@@ -686,7 +702,6 @@
             if (!files.length) return;
 
             const uploadType = document.querySelector('input[name="uploadType"]:checked').value;
-            let successCount = 0;
 
             for (const file of files) {
                 try {
@@ -704,7 +719,6 @@
                     };
 
                     await saveManual(newManual);
-                    successCount++;
                 } catch (err) {
                     console.error("Error procesando " + file.name, err);
                 }
@@ -712,11 +726,6 @@
 
             await renderAll();
             e.target.value = '';
-
-            if (successCount > 0) {
-                alert(`¡Éxito! Se han importado y guardado ${successCount} documento(s) Word correctamente.`);
-            }
-
             switchTab(uploadType === 'PROVEEDOR' ? 'vis-prov-tab' : 'vis-int-tab');
         }
 
@@ -768,11 +777,6 @@
             const title = document.getElementById(titleInputId).value.trim();
             const htmlContent = document.getElementById(editorId).innerHTML;
 
-            if (!title) {
-                alert('Ingrese el nombre o razón social.');
-                return;
-            }
-
             const data = await getAllManuals();
             const existingItem = data.find(m => m.id === selectedId);
 
@@ -787,19 +791,18 @@
 
             await saveManual(newItem);
             await renderAll();
-            alert('¡Manual guardado correctamente!');
             switchTab(isProv ? 'vis-prov-tab' : 'vis-int-tab');
         }
 
         async function deleteManual(id) {
-            if (confirm('¿Está seguro de que desea eliminar este manual?')) {
+            if (confirm('¿Desea eliminar este registro?')) {
                 await deleteManualFromDB(id);
                 await renderAll();
             }
         }
 
         async function clearAllData() {
-            if (confirm('¿ATENCIÓN: Está seguro de que desea eliminar TODOS los manuales del sistema?')) {
+            if (confirm('¿Desea vaciar toda la base de datos de manuales?')) {
                 await clearDB();
                 await renderAll();
             }
@@ -822,7 +825,7 @@
             document.execCommand(command, false, null);
         }
 
-        function triggerEditorImageUpload(targetEditorId) {
+        function triggerEditorImageUpload() {
             document.getElementById('editorImgInput').click();
         }
 
@@ -832,7 +835,7 @@
 
             const reader = new FileReader();
             reader.onload = function(event) {
-                const imgTag = `<img src="${event.target.result}" style="max-width:100%; border-radius:8px; margin:10px 0;">`;
+                const imgTag = `<img src="${event.target.result}" style="max-width:100%; margin:10px 0;">`;
                 document.execCommand('insertHTML', false, imgTag);
             };
             reader.readAsDataURL(file);
@@ -850,7 +853,7 @@
             const content = document.getElementById('modalFullContent').innerHTML;
             const title = document.getElementById('modalTitle').innerText;
             const printWin = window.open('', '', 'width=900,height=700');
-            printWin.document.write(`<html><head><title>${title}</title><style>body{font-family:sans-serif;padding:20px;} img{max-width:100%;}</style></head><body><h2>${title}</h2><hr>${content}</body></html>`);
+            printWin.document.write(`<html><head><title>${title}</title></head><body><h2>${title}</h2><hr>${content}</body></html>`);
             printWin.document.close();
             printWin.print();
         }
