@@ -12,20 +12,19 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.6.0/mammoth.browser.min.js"></script>
     <style>
         :root {
-            /* PALETA DE COLORES ACTUALIZADA */
-            --header-blue: #0d47a1;         /* Azul oscuro corporativo para la barra superior */
-            --blue-primary: #1565c0;        /* Azul principal para acentos, pestaña activa y bordes */
-            --blue-hover: #0d47a1;          /* Azul más oscuro para efecto hover */
+            --header-blue: #0d47a1;
+            --blue-primary: #1565c0;
+            --blue-hover: #0d47a1;
             
-            --bg-page: #f4f4f4;            /* Fondo gris claro general */
-            --bg-card: #ffffff;            /* Fondo blanco de contenedores */
-            --bg-table-header: #e9e9e9;    /* Encabezado de tablas */
+            --bg-page: #f4f4f4;
+            --bg-card: #ffffff;
+            --bg-table-header: #e9e9e9;
             --bg-table-hover: #f9f9f9;
             
-            --border-light: #dcdcdc;       /* Bordes finos y limpios */
-            --text-dark: #333333;          /* Texto principal */
-            --text-muted: #666666;        /* Etiquetas y textos secundarios */
-            --badge-info: #9ec5d3;         /* Celeste de contadores */
+            --border-light: #dcdcdc;
+            --text-dark: #333333;
+            --text-muted: #666666;
+            --badge-info: #9ec5d3;
         }
 
         body {
@@ -37,7 +36,6 @@
             padding: 0;
         }
 
-        /* Top Bar en color AZUL */
         .top-bar-blue {
             background-color: var(--header-blue);
             color: #ffffff;
@@ -52,7 +50,6 @@
             letter-spacing: -0.5px;
         }
 
-        /* Nav Pestañas Principales */
         .main-navbar {
             background-color: #ffffff;
             border-bottom: 2px solid var(--border-light);
@@ -81,7 +78,6 @@
             transition: color 0.2s ease-in-out;
         }
 
-        /* Subrayado de pestaña activa en color AZUL */
         .nav-portalsn .nav-link.active {
             color: var(--text-dark);
             background: transparent;
@@ -97,12 +93,10 @@
             background-color: var(--blue-primary);
         }
 
-        /* Hover de cabeceras en color AZUL */
         .nav-portalsn .nav-link:hover:not(.active) {
             color: var(--blue-primary);
         }
 
-        /* Tarjetas de Contenido */
         .content-card {
             background-color: var(--bg-card);
             border: 1px solid var(--border-light);
@@ -118,7 +112,6 @@
             margin-bottom: 12px;
         }
 
-        /* Form Estilos e Inputs */
         .form-label-custom {
             font-size: 11px;
             font-weight: bold;
@@ -139,7 +132,6 @@
             box-shadow: none;
         }
 
-        /* Tablas */
         .table-portalsn {
             width: 100%;
             border-collapse: collapse;
@@ -167,7 +159,6 @@
             background-color: var(--bg-table-hover);
         }
 
-        /* Botones estilo Azul / Gris */
         .btn-portalsn-blue {
             background-color: var(--blue-primary);
             color: #ffffff;
@@ -197,7 +188,6 @@
             background-color: #e0e0e0;
         }
 
-        /* Insignias */
         .badge-count {
             background-color: var(--badge-info);
             color: #ffffff;
@@ -208,7 +198,6 @@
             display: inline-block;
         }
 
-        /* Insignia de Estado en color AZUL */
         .badge-status-ok {
             background-color: #e3f2fd;
             color: #0d47a1;
@@ -219,7 +208,6 @@
             border-radius: 2px;
         }
 
-        /* Editor de Texto */
         .manual-editor {
             background-color: #ffffff;
             color: var(--text-dark);
@@ -254,6 +242,27 @@
             color: white;
         }
 
+        /* AJUSTES PARA EL VISUALIZADOR (MODAL) */
+        #modalFullContent {
+            overflow-x: auto;
+            word-wrap: break-word;
+            overflow-wrap: break-word;
+        }
+
+        #modalFullContent img {
+            max-width: 100% !important;
+            height: auto !important;
+            display: block;
+            margin: 10px auto;
+        }
+
+        #modalFullContent table {
+            max-width: 100% !important;
+            width: 100% !important;
+            table-layout: fixed;
+            word-break: break-word;
+        }
+
         ::-webkit-scrollbar {
             width: 6px;
             height: 6px;
@@ -268,7 +277,6 @@
 </head>
 <body>
 
-    <!-- Cabecera Superior en color AZUL -->
     <div class="top-bar-blue d-flex justify-content-between align-items-center">
         <div class="d-flex align-items-center gap-2">
             <i class="fa-solid fa-book-open text-white me-1"></i>
@@ -285,7 +293,6 @@
         </div>
     </div>
 
-    <!-- Navegación de Pestañas con Indicador y Hover AZUL -->
     <div class="main-navbar">
         <ul class="nav nav-portalsn d-flex justify-content-start" id="mainTabs" role="tablist">
             <li class="nav-item">
@@ -321,11 +328,9 @@
         </ul>
     </div>
 
-    <!-- Contenido Principal -->
     <div class="container-fluid px-4 py-3">
         <div class="tab-content" id="mainTabsContent">
             
-            <!-- Vis. Manual Proveedores -->
             <div class="tab-pane fade show active" id="vis-prov" role="tabpanel">
                 <div class="section-title">Seleccione la Orden o Razón Social que desea consultar:</div>
                 
@@ -355,7 +360,6 @@
                 </div>
             </div>
 
-            <!-- Mod. Manual Proveedores -->
             <div class="tab-pane fade" id="mod-prov" role="tabpanel">
                 <div class="section-title">Edición y Registro de Manuales de Proveedores:</div>
                 <div class="content-card">
@@ -393,7 +397,6 @@
                 </div>
             </div>
 
-            <!-- Vis. Manual Interno -->
             <div class="tab-pane fade" id="vis-int" role="tabpanel">
                 <div class="section-title">Seleccione el Proceso Interno que desea consultar:</div>
                 <div class="content-card">
@@ -419,7 +422,6 @@
                 </div>
             </div>
 
-            <!-- Mod. Manual Interno -->
             <div class="tab-pane fade" id="mod-int" role="tabpanel">
                 <div class="section-title">Edición y Registro de Manuales Internos:</div>
                 <div class="content-card">
@@ -457,7 +459,6 @@
                 </div>
             </div>
 
-            <!-- Carga Masiva (.docx) -->
             <div class="tab-pane fade" id="carga" role="tabpanel">
                 <div class="section-title">Carga Masiva de Archivos (.docx):</div>
                 <div class="content-card text-center py-5">
@@ -477,7 +478,6 @@
                 </div>
             </div>
 
-            <!-- Administración -->
             <div class="tab-pane fade" id="admin" role="tabpanel">
                 <div class="section-title">Consola de Administración de Documentos:</div>
                 <div class="content-card">
@@ -501,7 +501,6 @@
         </div>
     </div>
 
-    <!-- Hidden file input para insertar imagen en editor -->
     <input type="file" id="editorImgInput" accept="image/*" class="d-none" onchange="insertImageIntoEditor(event)">
 
     <!-- Modal Visualizador -->
@@ -526,7 +525,6 @@
         </div>
     </div>
 
-    <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
     <script>
