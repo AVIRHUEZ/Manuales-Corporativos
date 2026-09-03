@@ -222,6 +222,15 @@
             outline: none;
         }
 
+        .manual-editor img, #modalFullContent img {
+            max-width: 100% !important;
+            height: auto !important;
+            display: block;
+            margin: 10px auto;
+            image-rendering: -webkit-optimize-contrast;
+            image-rendering: crisp-edges;
+        }
+
         .editor-toolbar {
             background-color: var(--bg-table-header);
             border: 1px solid var(--border-light);
@@ -249,13 +258,6 @@
             overflow-x: auto;
             word-wrap: break-word;
             overflow-wrap: break-word;
-        }
-
-        #modalFullContent img {
-            max-width: 100% !important;
-            height: auto !important;
-            display: block;
-            margin: 10px auto;
         }
 
         #modalFullContent table {
@@ -485,7 +487,7 @@
                 <div class="content-card text-center py-5">
                     <i class="fa-solid fa-file-arrow-up fa-3x text-muted mb-3"></i>
                     <h6>Importador de Documentos Word</h6>
-                    <p class="text-muted small mb-4">Seleccione la categoría e importe sus archivos Word a Firebase Cloud.</p>
+                    <p class="text-muted small mb-4">Seleccione la categoría e importe sus archivos Word a la plataforma.</p>
 
                     <div class="d-flex justify-content-center gap-4 mb-4">
                         <label class="form-check-label"><input type="radio" name="uploadType" value="PROVEEDOR" checked> Manual Proveedores</label>
@@ -536,6 +538,9 @@
                     <div id="modalFullContent" style="font-size: 13px; line-height: 1.5;"></div>
                 </div>
                 <div class="modal-footer py-2" style="background-color: var(--bg-table-header);">
+                    <button type="button" id="modalDownloadBtn" class="btn-portalsn-blue">
+                        <i class="fa-solid fa-file-word me-1"></i>Descargar Word
+                    </button>
                     <button type="button" class="btn-portalsn-gray" onclick="printModalContent()"><i class="fa-solid fa-print me-1"></i>Imprimir</button>
                     <button type="button" class="btn-portalsn-gray" data-bs-dismiss="modal">Cerrar</button>
                 </div>
@@ -546,6 +551,7 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
     <script>
+        // Configuración e Inicialización de Firebase
         const firebaseConfig = {
             apiKey: "AIzaSyC8ymgbvCE9M_EiFEwQ_nCCqqd0Jsk9kHY",
             authDomain: "manuales-corporativos.firebaseapp.com",
@@ -560,6 +566,49 @@
         const db = firebase.firestore();
         const COLLECTION = "manuales";
 
+        // Inicializar IndexedDB local para guardar los binarios .docx
+        const LOCAL_DB_NAME = 'DocxFilesDB';
+        const LOCAL_STORE = 'files';
+
+        function openLocalDB() {
+            return new Promise((resolve, reject) => {
+                const req = indexedDB.open(LOCAL_DB_NAME, 1);
+                req.onupgradeneeded = e => e.target.result.createObjectStore(LOCAL_STORE, { keyPath: 'id' });
+                req.onsuccess = () => resolve(req.result);
+                req.onerror = () => reject(req.error);
+            });
+        }
+
+        async function saveLocalDocx(id, arrayBuffer, fileName) {
+            const ldb = await openLocalDB();
+            return new Promise((resolve, reject) => {
+                const tx = ldb.transaction(LOCAL_STORE, 'readwrite');
+                tx.objectStore(LOCAL_STORE).put({ id, arrayBuffer, fileName });
+                tx.oncomplete = () => resolve();
+                tx.onerror = () => reject(tx.error);
+            });
+        }
+
+        async function getLocalDocx(id) {
+            const ldb = await openLocalDB();
+            return new Promise((resolve) => {
+                const tx = ldb.transaction(LOCAL_STORE, 'readonly');
+                const req = tx.objectStore(LOCAL_STORE).get(id);
+                req.onsuccess = () => resolve(req.result);
+                req.onerror = () => resolve(null);
+            });
+        }
+
+        async function deleteLocalDocx(id) {
+            const ldb = await openLocalDB();
+            return new Promise((resolve) => {
+                const tx = ldb.transaction(LOCAL_STORE, 'readwrite');
+                tx.objectStore(LOCAL_STORE).delete(id);
+                tx.oncomplete = () => resolve();
+                tx.onerror = () => resolve();
+            });
+        }
+
         let currentManuals = [];
 
         db.collection(COLLECTION).onSnapshot(snapshot => {
@@ -570,7 +619,6 @@
             renderAll();
         }, error => {
             console.error("Error al sincronizar datos:", error);
-            alert("Error al cargar datos de Firebase. Verifique las Reglas de Firestore.");
         });
 
         function showLoading(msg) {
@@ -582,7 +630,7 @@
             document.getElementById('loadingOverlay').style.display = 'none';
         }
 
-        function renderAll() {
+        async function renderAll() {
             const tableProv = document.getElementById('tableProv');
             const tableInt = document.getElementById('tableInt');
             const tableAdmin = document.getElementById('tableAdmin');
@@ -604,9 +652,15 @@
 
             let provCount = 0;
 
-            currentManuals.forEach(item => {
+            for (const item of currentManuals) {
                 const isProv = item.type === 'PROVEEDOR';
                 if (isProv) provCount++;
+
+                const localFile = await getLocalDocx(item.id);
+                const downloadBtnHtml = localFile ? 
+                    `<button class="btn-portalsn-gray py-0 px-2 me-1" title="Descargar Word" onclick="downloadOriginalWord('${item.id}')">
+                        <i class="fa-solid fa-file-word text-primary"></i>
+                     </button>` : '';
 
                 const rowHtml = `
                     <tr>
@@ -617,6 +671,7 @@
                             <button class="btn-portalsn-gray py-0 px-2 me-1" onclick="viewFullManual('${item.id}')">
                                 <i class="fa-solid fa-eye me-1"></i>Ver
                             </button>
+                            ${downloadBtnHtml}
                             <button class="btn-portalsn-gray py-0 px-2 me-1" onclick="openInEditor('${item.id}')">
                                 <i class="fa-solid fa-pen"></i>
                             </button>
@@ -637,9 +692,27 @@
                     intSelectManual.innerHTML += `<option value="${item.id}">${item.title}</option>`;
                 }
                 tableAdmin.innerHTML += rowHtml;
-            });
+            }
 
             document.getElementById('provCountBadge').innerHTML = `<i class="fa-solid fa-magnifying-glass me-1"></i>Se encontraron ${provCount} registros`;
+        }
+
+        async function downloadOriginalWord(id) {
+            const localFile = await getLocalDocx(id);
+            if (!localFile) {
+                alert("El archivo Word original solo se encuentra disponible en la PC desde la que fue cargado.");
+                return;
+            }
+
+            const blob = new Blob([localFile.arrayBuffer], { type: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = localFile.fileName || 'manual.docx';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
         }
 
         async function processWordFiles(e) {
@@ -658,19 +731,21 @@
                     const result = await mammoth.convertToHtml({ arrayBuffer: arrayBuffer });
                     
                     let htmlContent = result.value;
-                    htmlContent = await compressHtmlImages(htmlContent);
+                    htmlContent = await optimizeHtmlImagesHD(htmlContent);
 
                     const cleanTitle = file.name.replace(/\.[^/.]+$/, "").toUpperCase();
 
-                    await db.collection(COLLECTION).add({
+                    const docRef = await db.collection(COLLECTION).add({
                         type: uploadType,
                         title: cleanTitle,
                         htmlContent: htmlContent,
                         createdAt: firebase.firestore.FieldValue.serverTimestamp()
                     });
+
+                    // Guardar copia descargable del .docx localmente asociada al ID de Firebase
+                    await saveLocalDocx(docRef.id, arrayBuffer, file.name);
                 } catch (err) {
-                    console.error("Error al subir " + file.name, err);
-                    alert("Error guardando el archivo " + file.name + ". Verifique que el peso no exceda el límite.");
+                    console.error("Error procesando " + file.name, err);
                 }
             }
 
@@ -679,7 +754,8 @@
             switchTab(uploadType === 'PROVEEDOR' ? 'vis-prov-tab' : 'vis-int-tab');
         }
 
-        function compressHtmlImages(html) {
+        // Optimización que mantiene la nitidez en Alta Definición
+        function optimizeHtmlImagesHD(html) {
             return new Promise((resolve) => {
                 const div = document.createElement('div');
                 div.innerHTML = html;
@@ -696,7 +772,7 @@
                     image.onload = () => {
                         let width = image.width;
                         let height = image.height;
-                        const maxDim = 800;
+                        const maxDim = 1200;
 
                         if (width > maxDim || height > maxDim) {
                             if (width > height) {
@@ -710,8 +786,12 @@
 
                         canvas.width = width;
                         canvas.height = height;
+                        
+                        ctx.imageSmoothingEnabled = true;
+                        ctx.imageSmoothingQuality = 'high';
                         ctx.drawImage(image, 0, 0, width, height);
-                        img.src = canvas.toDataURL('image/jpeg', 0.6);
+
+                        img.src = canvas.toDataURL('image/jpeg', 0.92);
 
                         processed++;
                         if (processed === imgs.length) resolve(div.innerHTML);
@@ -727,12 +807,22 @@
             });
         }
 
-        function viewFullManual(id) {
+        async function viewFullManual(id) {
             const item = currentManuals.find(m => m.id === id);
             if (!item) return;
 
             document.getElementById('modalTitle').innerText = item.title + " (" + item.type + ")";
             document.getElementById('modalFullContent').innerHTML = item.htmlContent || '<p>Sin contenido.</p>';
+
+            const modalDownloadBtn = document.getElementById('modalDownloadBtn');
+            const localFile = await getLocalDocx(id);
+
+            if (localFile) {
+                modalDownloadBtn.style.display = 'inline-block';
+                modalDownloadBtn.onclick = () => downloadOriginalWord(id);
+            } else {
+                modalDownloadBtn.style.display = 'none';
+            }
 
             const modal = new bootstrap.Modal(document.getElementById('viewModal'));
             modal.show();
@@ -784,7 +874,7 @@
             if (!title) return;
 
             showLoading("Guardando cambios...");
-            htmlContent = await compressHtmlImages(htmlContent);
+            htmlContent = await optimizeHtmlImagesHD(htmlContent);
 
             if (selectedId === 'NEW') {
                 await db.collection(COLLECTION).add({
@@ -808,16 +898,20 @@
             if (confirm("¿Está seguro de eliminar este registro?")) {
                 showLoading("Eliminando...");
                 await db.collection(COLLECTION).doc(id).delete();
+                await deleteLocalDocx(id);
                 hideLoading();
             }
         }
 
         async function clearAllData() {
-            if (confirm("ATENCIÓN: Se eliminarán todos los manuales registrados en la nube. ¿Continuar?")) {
-                showLoading("Limpiando base de datos...");
+            if (confirm("ATENCIÓN: Se eliminarán todos los manuales de la plataforma. ¿Continuar?")) {
+                showLoading("Limpiando registros...");
                 const snapshot = await db.collection(COLLECTION).get();
                 const batch = db.batch();
-                snapshot.docs.forEach(doc => batch.delete(doc.ref));
+                snapshot.docs.forEach(doc => {
+                    batch.delete(doc.ref);
+                    deleteLocalDocx(doc.id);
+                });
                 await batch.commit();
                 hideLoading();
             }
