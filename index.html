@@ -1,120 +1,282 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="es" data-bs-theme="light">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Manuales Corporativos</title>
-    <!-- Bootstrap 5 CSS -->
+    <title>Enterprise Portal - Manuales Corporativos</title>
+    <!-- Bootstrap 5.3 -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <!-- Font Awesome -->
+    <!-- Font Awesome Pro icons -->
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <!-- Mammoth JS -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.6.0/mammoth.browser.min.js"></script>
     <style>
         :root {
-            --primary-color: #2563eb;
-            --secondary-color: #1e40af;
-            --bg-light: #f8fafc;
+            /* PALETA ANTI-FATIGA VISUAL (MÁXIMO 4 COLORES BASE) */
+            --bg-body: #f8f9fa;           /* 1. Blanco Cálido / Marfil Suave (Fondo General) */
+            --bg-accent: #f1f5f9;         /* Gris/Azul Térmico para Tablas y Modales */
+            --bg-card: #ffffff;           /* Blanco Puro (Tarjetas) */
+            
+            --primary-brand: #2563eb;     /* 2. Azul Corporativo Ergonomizado (Estructura/Botones) */
+            --primary-brand-hover: #1d4ed8;
+
+            --neutral-slate: #475569;     /* 3. Azul Slate Neutro (Sustituto del Mostaza: Bordes/Subtítulos/Iconos) */
+            --neutral-slate-light: #e2e8f0;
+
+            --status-green: #15803d;      /* 4. Verde Salvia / Menta (Estados "Listo") */
+            --status-green-bg: #dcfce7;
+
+            --border-color: #cbd5e1;      /* Bordes de bajo contraste */
+            --text-main: #1e293b;         /* Texto principal carbón suave */
+            --text-muted: #64748b;        /* Texto secundario de baja fatiga */
         }
+
         body {
-            background-color: var(--bg-light);
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            color: #334155;
+            background-color: var(--bg-body);
+            color: var(--text-main);
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            min-height: 100vh;
         }
-        .navbar-brand {
-            font-weight: 700;
-            color: var(--primary-color) !important;
+
+        .navbar-custom {
+            background: #ffffff;
+            border-bottom: 1px solid var(--border-color);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.03);
         }
-        .nav-pills .nav-link.active {
-            background-color: var(--primary-color);
+
+        .text-subtitle-custom {
+            color: var(--text-muted) !important;
         }
-        .nav-pills .nav-link {
-            color: #64748b;
-            font-weight: 500;
-            margin: 0 4px;
-            border-radius: 8px;
-        }
-        .card {
-            border: none;
+
+        .card-custom {
+            background-color: var(--bg-card);
+            border: 1px solid var(--border-color);
             border-radius: 12px;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+            box-shadow: 0 4px 12px rgba(30, 41, 59, 0.03);
         }
-        .step-badge {
-            width: 32px;
-            height: 32px;
-            border-radius: 50%;
-            background-color: var(--primary-color);
-            color: white;
+
+        .nav-pills .nav-link {
+            color: var(--text-muted);
+            border-radius: 8px;
+            padding: 10px 18px;
+            font-weight: 500;
+            transition: all 0.2s ease;
+        }
+
+        .nav-pills .nav-link.active {
+            background: var(--primary-brand);
+            color: #ffffff;
+            border: 1px solid var(--primary-brand-hover);
+        }
+
+        .nav-pills .nav-link:hover:not(.active) {
+            background-color: var(--bg-accent);
+            color: var(--text-main);
+        }
+
+        .input-custom {
+            background-color: #ffffff !important;
+            border-color: var(--border-color) !important;
+            color: var(--text-main) !important;
+        }
+
+        .input-custom::placeholder {
+            color: #94a3b8 !important;
+        }
+
+        .table-warm-custom {
+            --bs-table-bg: transparent;
+            --bs-table-color: var(--text-main);
+            --bs-table-border-color: var(--border-color);
+        }
+
+        .table-warm-custom th {
+            text-transform: uppercase;
+            font-size: 0.75rem;
+            letter-spacing: 0.05em;
+            color: var(--neutral-slate);
+            background-color: var(--bg-accent);
+            border-bottom-width: 2px;
+        }
+
+        /* Botones de Acción Unificados */
+        .btn-action-custom {
+            background-color: var(--bg-accent);
+            border: 1px solid var(--border-color);
+            color: var(--neutral-slate);
+            transition: all 0.2s ease;
+        }
+        
+        .btn-action-custom:hover {
+            background-color: var(--primary-brand);
+            color: #ffffff;
+            border-color: var(--primary-brand-hover);
+        }
+
+        .btn-action-word {
+            background-color: #e0f2fe;
+            border: 1px solid #bae6fd;
+            color: #0369a1;
+        }
+        .btn-action-word:hover {
+            background-color: var(--primary-brand);
+            color: #ffffff;
+        }
+
+        .manual-view-content {
+            background-color: #ffffff;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 24px;
+            color: var(--text-main);
+            max-height: 65vh;
+            overflow-y: auto;
+        }
+
+        .manual-view-content img {
+            max-width: 100% !important;
+            height: auto !important;
+            border-radius: 8px;
+            margin: 16px 0;
+            border: 1px solid var(--border-color);
+        }
+
+        .manual-editor {
+            background-color: #ffffff;
+            color: var(--text-main);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 16px;
+            min-height: 350px;
+            max-height: 550px;
+            overflow-y: auto;
+            outline: none;
+        }
+
+        .manual-editor img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 6px;
+        }
+
+        .editor-toolbar {
+            background-color: var(--bg-accent);
+            border: 1px solid var(--border-color);
+            border-bottom: none;
+            border-radius: 8px 8px 0 0;
+            padding: 8px;
             display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: bold;
+            gap: 6px;
+            flex-wrap: wrap;
         }
-        .badge-provider {
-            background-color: #dbeafe;
-            color: #1e40af;
+
+        .editor-toolbar button {
+            background: #ffffff;
+            border: 1px solid var(--border-color);
+            color: var(--neutral-slate);
+            border-radius: 4px;
+            padding: 4px 10px;
+            font-size: 0.85rem;
         }
-        .badge-internal {
-            background-color: #f3e8ff;
-            color: #6b21a8;
+
+        .editor-toolbar button:hover {
+            background: var(--primary-brand);
+            color: white;
         }
-        .share-toast {
-            position: fixed;
-            bottom: 20px;
-            right: 20px;
-            z-index: 1050;
+
+        /* Unificación de Badges */
+        .badge-type-custom {
+            background: var(--neutral-slate-light);
+            color: var(--neutral-slate);
+            border: 1px solid var(--border-color);
+        }
+
+        .badge-status-ready {
+            background: var(--status-green-bg);
+            color: var(--status-green);
+            border: 1px solid #a7f3d0;
+        }
+
+        .btn-custom-brand {
+            background-color: var(--primary-brand);
+            color: #ffffff;
+            border: 1px solid var(--primary-brand-hover);
+        }
+
+        .btn-custom-brand:hover {
+            background-color: var(--primary-brand-hover);
+            color: #ffffff;
+        }
+
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: var(--bg-body);
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
         }
     </style>
 </head>
 <body>
 
-    <!-- Header -->
-    <header class="bg-white border-bottom py-3 mb-4 shadow-sm">
-        <div class="container d-flex justify-content-between align-items-center">
-            <div class="d-flex align-items-center gap-3">
-                <div class="bg-primary text-white p-2 rounded-3">
-                    <i class="fa-solid fa-book-bookmark fa-xl"></i>
+    <!-- Header / Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-custom sticky-top py-3">
+        <div class="container-fluid px-4">
+            <a class="navbar-brand d-flex align-items-center gap-3" href="#">
+                <div class="p-2 rounded-3 text-white" style="background-color: var(--primary-brand);">
+                    <i class="fa-solid fa-layer-group fa-lg"></i>
                 </div>
                 <div>
-                    <h1 class="h4 mb-0 fw-bold text-dark">Manuales Corporativos</h1>
-                    <small class="text-muted">Gestión de Proveedores y Procesos Internos</small>
+                    <span class="fw-bold fs-5 d-block" style="color: var(--text-main);">Enterprise Manuals Platform</span>
+                    <small class="text-subtitle-custom fs-7">Gestión de Documentación y Procedimientos Corporativos</small>
                 </div>
-            </div>
-            <button class="btn btn-outline-primary btn-sm" onclick="shareCurrentState()">
-                <i class="fa-solid fa-share-nodes me-1"></i> Compartir Enlace
+            </a>
+            <button class="btn btn-outline-secondary btn-sm rounded-pill px-3" onclick="shareCurrentState()">
+                <i class="fa-solid fa-share-nodes me-2"></i>Exportar Estado
             </button>
         </div>
-    </header>
+    </nav>
 
-    <div class="container">
+    <!-- Main Workspace -->
+    <div class="container-fluid px-4 py-4">
+        
         <!-- Navigation Tabs -->
-        <ul class="nav nav-pills justify-content-center mb-4 bg-white p-2 rounded-3 shadow-sm" id="mainTabs" role="tablist">
+        <ul class="nav nav-pills justify-content-center mb-4 gap-2 card-custom p-2" id="mainTabs" role="tablist">
             <li class="nav-item">
                 <button class="nav-link active" id="vis-prov-tab" data-bs-toggle="pill" data-bs-target="#vis-prov" type="button">
-                    <i class="fa-solid fa-building me-1"></i> Vis. Manual Proveedor
+                    <i class="fa-solid fa-building-circle-check me-2"></i>Vis. Manual Proveedores
                 </button>
             </li>
             <li class="nav-item">
                 <button class="nav-link" id="mod-prov-tab" data-bs-toggle="pill" data-bs-target="#mod-prov" type="button">
-                    <i class="fa-solid fa-pen-to-square me-1"></i> Mod. Manual Proveedor
+                    <i class="fa-solid fa-pen-to-square me-2"></i>Mod. Manual Proveedores
                 </button>
             </li>
             <li class="nav-item">
                 <button class="nav-link" id="vis-int-tab" data-bs-toggle="pill" data-bs-target="#vis-int" type="button">
-                    <i class="fa-solid fa-folder-open me-1"></i> Vis. Manual Interno
+                    <i class="fa-solid fa-folder-tree me-2"></i>Vis. Manual Interno
                 </button>
             </li>
             <li class="nav-item">
                 <button class="nav-link" id="mod-int-tab" data-bs-toggle="pill" data-bs-target="#mod-int" type="button">
-                    <i class="fa-solid fa-file-pen me-1"></i> Mod. Manual Interno
+                    <i class="fa-solid fa-file-pen me-2"></i>Mod. Manual Interno
                 </button>
             </li>
             <li class="nav-item">
                 <button class="nav-link" id="carga-tab" data-bs-toggle="pill" data-bs-target="#carga" type="button">
-                    <i class="fa-solid fa-cloud-arrow-up me-1"></i> Carga Masiva
+                    <i class="fa-solid fa-cloud-arrow-up me-2"></i>Carga Masiva (.docx)
                 </button>
             </li>
             <li class="nav-item">
                 <button class="nav-link" id="admin-tab" data-bs-toggle="pill" data-bs-target="#admin" type="button">
-                    <i class="fa-solid fa-sliders me-1"></i> Administración General
+                    <i class="fa-solid fa-sliders me-2"></i>Administración General
                 </button>
             </li>
         </ul>
@@ -124,19 +286,27 @@
             
             <!-- Vis. Manual Proveedor -->
             <div class="tab-pane fade show active" id="vis-prov" role="tabpanel">
-                <div class="card p-4">
-                    <div class="d-flex justify-content-between align-items-center mb-4">
-                        <h2 class="h5 fw-bold mb-0">Directorio de Manuales de Proveedores</h2>
-                        <input type="text" id="searchProv" class="form-control w-25" placeholder="Buscar por nombre..." onkeyup="filterManuals('PROVEEDOR')">
+                <div class="card card-custom p-4">
+                    <div class="row align-items-center mb-4 g-3">
+                        <div class="col-md-6">
+                            <h2 class="h5 fw-bold mb-0" style="color: var(--text-main);"><i class="fa-solid fa-building me-2" style="color: var(--primary-brand);"></i>Directorio de Manuales de Proveedores</h2>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="input-group">
+                                <span class="input-group-text input-custom border-end-0 text-subtitle-custom"><i class="fa-solid fa-magnifying-glass"></i></span>
+                                <input type="text" id="searchProvInput" class="form-control input-custom border-start-0" list="provOptions" placeholder="Seleccione o busque Razón Social / Proveedor..." oninput="filterManuals('PROVEEDOR')">
+                                <datalist id="provOptions"></datalist>
+                            </div>
+                        </div>
                     </div>
                     <div class="table-responsive">
-                        <table class="table table-hover align-middle">
-                            <thead class="table-light">
+                        <table class="table table-warm-custom align-middle">
+                            <thead>
                                 <tr>
                                     <th>TIPO</th>
-                                    <th>NOMBRE / IDENTIFICADOR</th>
+                                    <th>RAZÓN SOCIAL / NOMBRE</th>
                                     <th>ESTADO</th>
-                                    <th class="text-end">ACCIÓN</th>
+                                    <th class="text-end">ACCIONES</th>
                                 </tr>
                             </thead>
                             <tbody id="tableProv"></tbody>
@@ -145,43 +315,42 @@
                 </div>
             </div>
 
-            <!-- Mod. Manual Proveedor (Editor) -->
+            <!-- Mod. Manual Proveedor -->
             <div class="tab-pane fade" id="mod-prov" role="tabpanel">
-                <div class="card p-4">
-                    <h2 class="h5 fw-bold mb-3"><i class="fa-solid fa-plus-circle me-2 text-primary"></i>Crear / Modificar Manual de Proveedor</h2>
-                    <form id="formProv" onsubmit="saveManual(event, 'PROVEEDOR')">
+                <div class="card card-custom p-4">
+                    <h2 class="h5 fw-bold mb-3" style="color: var(--text-main);"><i class="fa-solid fa-pen-to-square me-2" style="color: var(--primary-brand);"></i>Editor de Manual de Proveedor</h2>
+                    <form onsubmit="saveManualEditor(event, 'PROVEEDOR')">
                         <div class="row g-3 mb-3">
-                            <div class="col-md-8">
-                                <label class="form-label font-weight-bold">Nombre de la Empresa / Empresa Registrada</label>
-                                <input type="text" id="provTitle" class="form-control" placeholder="Ej: APM TERMINALS CALLAO S.A." required>
-                            </div>
-                            <div class="col-md-4">
-                                <label class="form-label">Estado</label>
-                                <select id="provStatus" class="form-select">
-                                    <option value="Listo para visualizar">Listo para visualizar</option>
-                                    <option value="En revisión">En revisión</option>
-                                    <option value="Borrador">Borrador</option>
+                            <div class="col-md-6">
+                                <label class="form-label text-subtitle-custom">Seleccionar Manual a Editar (o Crear Nuevo)</label>
+                                <select id="provSelectManual" class="form-select input-custom" onchange="loadManualIntoEditor('PROVEEDOR')">
+                                    <option value="NEW">-- Crear Nuevo Manual desde Cero --</option>
                                 </select>
                             </div>
-                        </div>
-
-                        <div class="mb-3">
-                            <label class="form-label">Objetivo del Manual</label>
-                            <textarea id="provObjective" class="form-control" rows="2" placeholder="Guía paso a paso para el registro, gestión y facturación..."></textarea>
-                        </div>
-
-                        <div class="mb-3">
-                            <div class="d-flex justify-content-between align-items-center mb-2">
-                                <label class="form-label fw-bold mb-0">Pasos del Procedimiento</label>
-                                <button type="button" class="btn btn-sm btn-outline-primary" onclick="addStepField('provStepsContainer')">
-                                    <i class="fa-solid fa-plus me-1"></i> Añadir Paso
-                                </button>
+                            <div class="col-md-6">
+                                <label class="form-label text-subtitle-custom">Razón Social / Nombre del Proveedor</label>
+                                <input type="text" id="provTitleEdit" class="form-control input-custom" placeholder="Ej: APM TERMINALS CALLAO S.A." required>
                             </div>
-                            <div id="provStepsContainer" class="d-flex flex-column gap-2"></div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label text-subtitle-custom">Contenido Íntegro y Procedimiento</label>
+                            <div class="editor-toolbar">
+                                <button type="button" onclick="execCmd('bold')"><i class="fa-solid fa-bold"></i></button>
+                                <button type="button" onclick="execCmd('italic')"><i class="fa-solid fa-italic"></i></button>
+                                <button type="button" onclick="execCmd('underline')"><i class="fa-solid fa-underline"></i></button>
+                                <button type="button" onclick="execCmd('insertUnorderedList')"><i class="fa-solid fa-list-ul"></i></button>
+                                <button type="button" onclick="execCmd('insertOrderedList')"><i class="fa-solid fa-list-ol"></i></button>
+                                <button type="button" onclick="execCmd('justifyLeft')"><i class="fa-solid fa-align-left"></i></button>
+                                <button type="button" onclick="execCmd('justifyCenter')"><i class="fa-solid fa-align-center"></i></button>
+                                <button type="button" onclick="execCmd('justifyRight')"><i class="fa-solid fa-align-right"></i></button>
+                                <button type="button" onclick="triggerEditorImageUpload('provEditor')"><i class="fa-solid fa-image me-1"></i>Insertar Imagen</button>
+                            </div>
+                            <div id="provEditor" class="manual-editor" contenteditable="true"></div>
                         </div>
 
                         <div class="d-flex justify-content-end gap-2">
-                            <button type="submit" class="btn btn-primary"><i class="fa-solid fa-floppy-disk me-1"></i> Guardar Manual</button>
+                            <button type="submit" class="btn btn-custom-brand px-4"><i class="fa-solid fa-floppy-disk me-2"></i>Guardar Cambios en Manual</button>
                         </div>
                     </form>
                 </div>
@@ -189,19 +358,27 @@
 
             <!-- Vis. Manual Interno -->
             <div class="tab-pane fade" id="vis-int" role="tabpanel">
-                <div class="card p-4">
-                    <div class="d-flex justify-content-between align-items-center mb-4">
-                        <h2 class="h5 fw-bold mb-0">Directorio de Manuales Internos</h2>
-                        <input type="text" id="searchInt" class="form-control w-25" placeholder="Buscar por nombre..." onkeyup="filterManuals('INTERNO')">
+                <div class="card card-custom p-4">
+                    <div class="row align-items-center mb-4 g-3">
+                        <div class="col-md-6">
+                            <h2 class="h5 fw-bold mb-0" style="color: var(--text-main);"><i class="fa-solid fa-folder-tree me-2" style="color: var(--primary-brand);"></i>Directorio de Manuales Internos</h2>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="input-group">
+                                <span class="input-group-text input-custom border-end-0 text-subtitle-custom"><i class="fa-solid fa-magnifying-glass"></i></span>
+                                <input type="text" id="searchIntInput" class="form-control input-custom border-start-0" list="intOptions" placeholder="Seleccione o busque proceso interno..." oninput="filterManuals('INTERNO')">
+                                <datalist id="intOptions"></datalist>
+                            </div>
+                        </div>
                     </div>
                     <div class="table-responsive">
-                        <table class="table table-hover align-middle">
-                            <thead class="table-light">
+                        <table class="table table-warm-custom align-middle">
+                            <thead>
                                 <tr>
                                     <th>TIPO</th>
-                                    <th>NOMBRE / IDENTIFICADOR</th>
+                                    <th>NOMBRE DEL MANUAL / PROCESO</th>
                                     <th>ESTADO</th>
-                                    <th class="text-end">ACCIÓN</th>
+                                    <th class="text-end">ACCIONES</th>
                                 </tr>
                             </thead>
                             <tbody id="tableInt"></tbody>
@@ -212,56 +389,67 @@
 
             <!-- Mod. Manual Interno -->
             <div class="tab-pane fade" id="mod-int" role="tabpanel">
-                <div class="card p-4">
-                    <h2 class="h5 fw-bold mb-3"><i class="fa-solid fa-plus-circle me-2 text-primary"></i>Crear / Modificar Manual Interno</h2>
-                    <form id="formInt" onsubmit="saveManual(event, 'INTERNO')">
+                <div class="card card-custom p-4">
+                    <h2 class="h5 fw-bold mb-3" style="color: var(--text-main);"><i class="fa-solid fa-file-pen me-2" style="color: var(--primary-brand);"></i>Editor de Manual Interno</h2>
+                    <form onsubmit="saveManualEditor(event, 'INTERNO')">
                         <div class="row g-3 mb-3">
-                            <div class="col-md-8">
-                                <label class="form-label font-weight-bold">Nombre del Proceso Interno</label>
-                                <input type="text" id="intTitle" class="form-control" placeholder="Ej: Solicitud de Requerimientos y Compras" required>
-                            </div>
-                            <div class="col-md-4">
-                                <label class="form-label">Estado</label>
-                                <select id="intStatus" class="form-select">
-                                    <option value="Listo para visualizar">Listo para visualizar</option>
-                                    <option value="En revisión">En revisión</option>
-                                    <option value="Borrador">Borrador</option>
+                            <div class="col-md-6">
+                                <label class="form-label text-subtitle-custom">Seleccionar Manual Interno a Editar</label>
+                                <select id="intSelectManual" class="form-select input-custom" onchange="loadManualIntoEditor('INTERNO')">
+                                    <option value="NEW">-- Crear Nuevo Manual Interno desde Cero --</option>
                                 </select>
                             </div>
-                        </div>
-
-                        <div class="mb-3">
-                            <label class="form-label">Objetivo del Manual</label>
-                            <textarea id="intObjective" class="form-control" rows="2" placeholder="Procedimiento operativo estándar para..."></textarea>
-                        </div>
-
-                        <div class="mb-3">
-                            <div class="d-flex justify-content-between align-items-center mb-2">
-                                <label class="form-label fw-bold mb-0">Pasos del Procedimiento</label>
-                                <button type="button" class="btn btn-sm btn-outline-primary" onclick="addStepField('intStepsContainer')">
-                                    <i class="fa-solid fa-plus me-1"></i> Añadir Paso
-                                </button>
+                            <div class="col-md-6">
+                                <label class="form-label text-subtitle-custom">Nombre del Proceso Interno</label>
+                                <input type="text" id="intTitleEdit" class="form-control input-custom" placeholder="Ej: Solicitud de Requerimientos Internos" required>
                             </div>
-                            <div id="intStepsContainer" class="d-flex flex-column gap-2"></div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label text-subtitle-custom">Contenido Íntegro del Manual</label>
+                            <div class="editor-toolbar">
+                                <button type="button" onclick="execCmd('bold')"><i class="fa-solid fa-bold"></i></button>
+                                <button type="button" onclick="execCmd('italic')"><i class="fa-solid fa-italic"></i></button>
+                                <button type="button" onclick="execCmd('underline')"><i class="fa-solid fa-underline"></i></button>
+                                <button type="button" onclick="execCmd('insertUnorderedList')"><i class="fa-solid fa-list-ul"></i></button>
+                                <button type="button" onclick="execCmd('insertOrderedList')"><i class="fa-solid fa-list-ol"></i></button>
+                                <button type="button" onclick="execCmd('justifyLeft')"><i class="fa-solid fa-align-left"></i></button>
+                                <button type="button" onclick="execCmd('justifyCenter')"><i class="fa-solid fa-align-center"></i></button>
+                                <button type="button" onclick="execCmd('justifyRight')"><i class="fa-solid fa-align-right"></i></button>
+                                <button type="button" onclick="triggerEditorImageUpload('intEditor')"><i class="fa-solid fa-image me-1"></i>Insertar Imagen</button>
+                            </div>
+                            <div id="intEditor" class="manual-editor" contenteditable="true"></div>
                         </div>
 
                         <div class="d-flex justify-content-end gap-2">
-                            <button type="submit" class="btn btn-primary"><i class="fa-solid fa-floppy-disk me-1"></i> Guardar Manual</button>
+                            <button type="submit" class="btn btn-custom-brand px-4"><i class="fa-solid fa-floppy-disk me-2"></i>Guardar Cambios en Manual</button>
                         </div>
                     </form>
                 </div>
             </div>
 
-            <!-- Carga Masiva -->
+            <!-- Carga Masiva (.docx) -->
             <div class="tab-pane fade" id="carga" role="tabpanel">
-                <div class="card p-5 text-center">
-                    <div class="border border-2 border-dashed rounded-3 p-5 bg-light">
-                        <i class="fa-solid fa-file-word text-primary fa-4x mb-3"></i>
-                        <h4 class="fw-bold">Carga Masiva de Manuales (.docx)</h4>
-                        <p class="text-muted mb-3">Haga clic o arrastre aquí sus manuales Word para procesarlos automáticamente.</p>
-                        <input type="file" id="fileUpload" class="d-none" multiple accept=".docx" onchange="handleFileUpload(event)">
-                        <button class="btn btn-primary btn-lg" onclick="document.getElementById('fileUpload').click()">
-                            <i class="fa-solid fa-folder-open me-2"></i> Seleccionar Archivos
+                <div class="card card-custom p-5 text-center">
+                    <div class="border border-2 border-dashed border-secondary-subtle rounded-4 p-5" style="background-color: #ffffff;">
+                        <i class="fa-solid fa-file-word fa-4x mb-3" style="color: var(--primary-brand);"></i>
+                        <h4 class="fw-bold" style="color: var(--text-main);">Importador Automático de Documentos (.docx)</h4>
+                        <p class="text-subtitle-custom mb-4">Cargue sus archivos Word. El sistema almacenará el Word original para descarga ilimitada y extraerá la vista previa.</p>
+                        
+                        <div class="d-flex justify-content-center gap-3 mb-4">
+                            <div class="form-check text-start">
+                                <input class="form-check-input" type="radio" name="uploadType" id="typeProv" value="PROVEEDOR" checked>
+                                <label class="form-check-label" style="color: var(--text-main);" for="typeProv">Cargar como Manual de Proveedor</label>
+                            </div>
+                            <div class="form-check text-start">
+                                <input class="form-check-input" type="radio" name="uploadType" id="typeInt" value="INTERNO">
+                                <label class="form-check-label" style="color: var(--text-main);" for="typeInt">Cargar como Manual Interno</label>
+                            </div>
+                        </div>
+
+                        <input type="file" id="fileUpload" class="d-none" multiple accept=".docx" onchange="processWordFiles(event)">
+                        <button class="btn btn-custom-brand btn-lg px-5 rounded-pill shadow-sm" onclick="document.getElementById('fileUpload').click()">
+                            <i class="fa-solid fa-folder-open me-2"></i>Seleccionar Archivos Word (.docx)
                         </button>
                     </div>
                 </div>
@@ -269,21 +457,19 @@
 
             <!-- Administración General -->
             <div class="tab-pane fade" id="admin" role="tabpanel">
-                <div class="card p-4">
+                <div class="card card-custom p-4">
                     <div class="d-flex justify-content-between align-items-center mb-4">
-                        <h2 class="h5 fw-bold mb-0">Directorio Consolidado Completo</h2>
-                        <button class="btn btn-primary" onclick="switchTab('mod-prov-tab')">
-                            <i class="fa-solid fa-plus me-1"></i> Cargar Nuevo Manual
-                        </button>
+                        <h2 class="h5 fw-bold mb-0" style="color: var(--text-main);"><i class="fa-solid fa-sliders me-2" style="color: var(--primary-brand);"></i>Administración Consolidada de Manuales</h2>
+                        <button class="btn btn-outline-secondary btn-sm" onclick="clearAllData()"><i class="fa-solid fa-trash-can me-1"></i>Eliminar Todos los Documentos</button>
                     </div>
                     <div class="table-responsive">
-                        <table class="table table-striped align-middle">
-                            <thead class="table-dark">
+                        <table class="table table-warm-custom align-middle">
+                            <thead>
                                 <tr>
                                     <th>TIPO</th>
-                                    <th>NOMBRE / IDENTIFICADOR</th>
+                                    <th>NOMBRE DEL MANUAL</th>
                                     <th>ESTADO</th>
-                                    <th class="text-end">ACCIÓN</th>
+                                    <th class="text-end">ACCIONES</th>
                                 </tr>
                             </thead>
                             <tbody id="tableAdmin"></tbody>
@@ -295,21 +481,28 @@
         </div>
     </div>
 
-    <!-- Modal Ver Manual -->
+    <!-- Hidden file input para imágenes en editor -->
+    <input type="file" id="editorImgInput" accept="image/*" class="d-none" onchange="insertImageIntoEditor(event)">
+
+    <!-- Modal Visualizador Completo del Documento -->
     <div class="modal fade" id="viewModal" tabindex="-1" aria-hidden="true">
-        <div class="modal-dialog modal-lg modal-dialog-scrollable">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title fw-bold" id="modalTitle">Detalle del Manual</h5>
+        <div class="modal-dialog modal-xl modal-dialog-scrollable">
+            <div class="modal-content" style="background-color: var(--bg-card); border-color: var(--border-color);">
+                <div class="modal-header" style="border-color: var(--border-color);">
+                    <div>
+                        <span id="modalBadge" class="badge badge-type-custom mb-1"></span>
+                        <h5 class="modal-title fw-bold" id="modalTitle" style="color: var(--primary-brand);"></h5>
+                    </div>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
-                <div class="modal-body" id="modalBody">
-                    <!-- Dynamic content -->
+                <div class="modal-body">
+                    <div id="modalFullContent" class="manual-view-content"></div>
                 </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-outline-secondary" onclick="window.print()">
-                        <i class="fa-solid fa-print me-1"></i> Imprimir / PDF
+                <div class="modal-footer" style="border-color: var(--border-color);">
+                    <button type="button" id="modalDownloadBtn" class="btn btn-custom-brand">
+                        <i class="fa-solid fa-file-word me-1"></i>Descargar Word Original
                     </button>
+                    <button type="button" class="btn btn-outline-secondary" onclick="printModalContent()"><i class="fa-solid fa-print me-1"></i>Imprimir / PDF</button>
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
                 </div>
             </div>
@@ -320,211 +513,329 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
     <script>
-        // Default Sample Data
-        const defaultData = [
-            {
-                id: "1",
-                type: "PROVEEDOR",
-                title: "APM TERMINALS CALLAO SOCIEDAD ANONIMA",
-                status: "Listo para visualizar",
-                objective: "Guía paso a paso para el registro, gestión e ingreso al portal corporativo.",
-                steps: [
-                    { title: "Acceso a la Plataforma", text: "Ingrese al portal corporativo con sus credenciales autorizadas." },
-                    { title: "Carga de Facturas y Guías", text: "Suba los documentos tributarios en formato XML y PDF correspondientes." }
-                ]
-            },
-            {
-                id: "2",
-                type: "PROVEEDOR",
-                title: "AUSTRAL GROUP S.A.A",
-                status: "Listo para visualizar",
-                objective: "Manual operativo de gestión comercial y seguimiento de ordenes de compra.",
-                steps: [
-                    { title: "Aceptación de Orden de Compra", text: "Confirmar recepción y fecha estimada de entrega en el módulo de compras." }
-                ]
-            },
-            {
-                id: "3",
-                type: "PROVEEDOR",
-                title: "ADMINISTRACIÓN DE EMPRESAS S.A.C.",
-                status: "Listo para visualizar",
-                objective: "Guía paso a paso para la facturación y validación tributaria.",
-                steps: [
-                    { title: "Acceso a la Plataforma e Inicio de Sesión", text: "Ingrese al portal oficial utilizando sus credenciales corporativas (RUC, Usuario y Contraseña)." },
-                    { title: "Carga de Documentación y Facturas", text: "Suba sus archivos de comprobante de pago correspondientes a la orden de servicio recibida." }
-                ]
-            }
-        ];
+        const DB_NAME = 'EnterpriseManualsDB';
+        const DB_VERSION = 2;
+        const STORE_NAME = 'manuals';
 
-        function getStoredData() {
-            const data = localStorage.getItem('manuales_data');
-            return data ? JSON.parse(data) : defaultData;
+        function openDB() {
+            return new Promise((resolve, reject) => {
+                const request = indexedDB.open(DB_NAME, DB_VERSION);
+                request.onupgradeneeded = function(e) {
+                    const db = e.target.result;
+                    if (!db.objectStoreNames.contains(STORE_NAME)) {
+                        db.createObjectStore(STORE_NAME, { keyPath: 'id' });
+                    }
+                };
+                request.onsuccess = () => resolve(request.result);
+                request.onerror = () => reject(request.error);
+            });
         }
 
-        function saveData(data) {
-            localStorage.setItem('manuales_data', JSON.stringify(data));
+        async function getAllManuals() {
+            const db = await openDB();
+            return new Promise((resolve, reject) => {
+                const tx = db.transaction(STORE_NAME, 'readonly');
+                const store = tx.objectStore(STORE_NAME);
+                const request = store.getAll();
+                request.onsuccess = () => resolve(request.result || []);
+                request.onerror = () => reject(request.error);
+            });
         }
 
-        function initData() {
-            if (!localStorage.getItem('manuales_data')) {
-                saveData(defaultData);
-            }
-            // Check URL parameters for direct share link
-            const urlParams = new URLSearchParams(window.location.search);
-            const sharedData = urlParams.get('data');
-            if (sharedData) {
-                try {
-                    const parsed = JSON.parse(atob(sharedData));
-                    saveData(parsed);
-                } catch(e) { console.error(e); }
-            }
-            renderTables();
+        async function saveManual(item) {
+            const db = await openDB();
+            return new Promise((resolve, reject) => {
+                const tx = db.transaction(STORE_NAME, 'readwrite');
+                const store = tx.objectStore(STORE_NAME);
+                const request = store.put(item);
+                request.onsuccess = () => resolve();
+                request.onerror = () => reject(request.error);
+            });
         }
 
-        function renderTables() {
-            const data = getStoredData();
+        async function deleteManualFromDB(id) {
+            const db = await openDB();
+            return new Promise((resolve, reject) => {
+                const tx = db.transaction(STORE_NAME, 'readwrite');
+                const store = tx.objectStore(STORE_NAME);
+                const request = store.delete(id);
+                request.onsuccess = () => resolve();
+                request.onerror = () => reject(request.error);
+            });
+        }
+
+        async function clearDB() {
+            const db = await openDB();
+            return new Promise((resolve, reject) => {
+                const tx = db.transaction(STORE_NAME, 'readwrite');
+                const store = tx.objectStore(STORE_NAME);
+                const request = store.clear();
+                request.onsuccess = () => resolve();
+                request.onerror = () => reject(request.error);
+            });
+        }
+
+        async function renderAll() {
+            const data = await getAllManuals();
             
             const tableProv = document.getElementById('tableProv');
             const tableInt = document.getElementById('tableInt');
             const tableAdmin = document.getElementById('tableAdmin');
+            
+            const provDatalist = document.getElementById('provOptions');
+            const intDatalist = document.getElementById('intOptions');
+
+            const provSelectManual = document.getElementById('provSelectManual');
+            const intSelectManual = document.getElementById('intSelectManual');
 
             tableProv.innerHTML = '';
             tableInt.innerHTML = '';
             tableAdmin.innerHTML = '';
+            provDatalist.innerHTML = '';
+            intDatalist.innerHTML = '';
+
+            provSelectManual.innerHTML = '<option value="NEW">-- Crear Nuevo Manual desde Cero --</option>';
+            intSelectManual.innerHTML = '<option value="NEW">-- Crear Nuevo Manual Interno desde Cero --</option>';
 
             data.forEach(item => {
-                const badgeClass = item.type === 'PROVEEDOR' ? 'badge-provider' : 'badge-internal';
+                const isProv = item.type === 'PROVEEDOR';
+                const hasFile = !!item.fileData;
+                
+                const downloadBtnHtml = hasFile ? 
+                    `<button class="btn btn-action-word btn-sm me-1" title="Descargar Word (.docx)" onclick="downloadOriginalWord('${item.id}')">
+                        <i class="fa-solid fa-file-word"></i>
+                     </button>` : '';
+
                 const rowHtml = `
                     <tr>
-                        <td><span class="badge ${badgeClass}">${item.type}</span></td>
-                        <td class="fw-semibold">${item.title}</td>
-                        <td><span class="text-success fw-medium"><i class="fa-solid fa-circle-check me-1"></i>${item.status}</span></td>
+                        <td><span class="badge badge-type-custom">${item.type}</span></td>
+                        <td class="fw-semibold" style="color: var(--text-main);">${item.title}</td>
+                        <td><span class="badge badge-status-ready"><i class="fa-solid fa-check me-1"></i>Listo</span></td>
                         <td class="text-end">
-                            <button class="btn btn-primary btn-sm me-1" onclick="viewManual('${item.id}')">
-                                <i class="fa-solid fa-book-open me-1"></i> Visualizar Manual
+                            <button class="btn btn-action-custom btn-sm me-1" onclick="viewFullManual('${item.id}')">
+                                <i class="fa-solid fa-eye me-1"></i>Visualizar
                             </button>
-                            <button class="btn btn-outline-danger btn-sm" onclick="deleteManual('${item.id}')">
+                            ${downloadBtnHtml}
+                            <button class="btn btn-action-custom btn-sm me-1" title="Editar en Portal" onclick="openInEditor('${item.id}')">
+                                <i class="fa-solid fa-pen"></i>
+                            </button>
+                            <button class="btn btn-action-custom btn-sm" title="Eliminar" onclick="deleteManual('${item.id}')">
                                 <i class="fa-solid fa-trash"></i>
                             </button>
                         </td>
                     </tr>
                 `;
 
-                if (item.type === 'PROVEEDOR') tableProv.innerHTML += rowHtml;
-                if (item.type === 'INTERNO') tableInt.innerHTML += rowHtml;
+                if (isProv) {
+                    tableProv.innerHTML += rowHtml;
+                    provDatalist.innerHTML += `<option value="${item.title}">`;
+                    provSelectManual.innerHTML += `<option value="${item.id}">${item.title}</option>`;
+                } else {
+                    tableInt.innerHTML += rowHtml;
+                    intDatalist.innerHTML += `<option value="${item.title}">`;
+                    intSelectManual.innerHTML += `<option value="${item.id}">${item.title}</option>`;
+                }
                 tableAdmin.innerHTML += rowHtml;
             });
         }
 
-        function addStepField(containerId, title = '', text = '') {
-            const container = document.getElementById(containerId);
-            const index = container.children.length + 1;
-            const stepDiv = document.createElement('div');
-            stepDiv.className = 'border p-3 rounded bg-white step-item mb-2';
-            stepDiv.innerHTML = `
-                <div class="d-flex justify-content-between align-items-center mb-2">
-                    <span class="fw-bold text-primary">Paso ${index}</span>
-                    <button type="button" class="btn btn-sm btn-outline-danger" onclick="this.closest('.step-item').remove()">
-                        <i class="fa-solid fa-xmark"></i>
-                    </button>
-                </div>
-                <input type="text" class="form-control mb-2 step-title" placeholder="Título del Paso" value="${title}" required>
-                <textarea class="form-control step-text" rows="2" placeholder="Descripción detallada..." required>${text}</textarea>
-            `;
-            container.appendChild(stepDiv);
-        }
-
-        function saveManual(e, type) {
-            e.preventDefault();
-            const data = getStoredData();
-
-            const isProv = type === 'PROVEEDOR';
-            const title = document.getElementById(isProv ? 'provTitle' : 'intTitle').value;
-            const status = document.getElementById(isProv ? 'provStatus' : 'intStatus').value;
-            const objective = document.getElementById(isProv ? 'provObjective' : 'intObjective').value;
-            const containerId = isProv ? 'provStepsContainer' : 'intStepsContainer';
-
-            const stepElements = document.querySelectorAll(`#${containerId} .step-item`);
-            const steps = [];
-            stepElements.forEach(el => {
-                steps.push({
-                    title: el.querySelector('.step-title').value,
-                    text: el.querySelector('.step-text').value
-                });
-            });
-
-            const newItem = {
-                id: Date.now().toString(),
-                type: type,
-                title: title,
-                status: status,
-                objective: objective,
-                steps: steps
-            };
-
-            data.push(newItem);
-            saveData(data);
-            renderTables();
-
-            alert('¡Manual guardado correctamente!');
-            e.target.reset();
-            document.getElementById(containerId).innerHTML = '';
-            switchTab(isProv ? 'vis-prov-tab' : 'vis-int-tab');
-        }
-
-        function viewManual(id) {
-            const data = getStoredData();
+        async function viewFullManual(id) {
+            const data = await getAllManuals();
             const item = data.find(m => m.id === id);
             if (!item) return;
 
             document.getElementById('modalTitle').innerText = item.title;
-            let stepsHtml = '';
-            if (item.steps && item.steps.length > 0) {
-                stepsHtml = item.steps.map((s, idx) => `
-                    <div class="d-flex gap-3 mb-3 p-3 bg-light rounded-3 align-items-start">
-                        <div class="step-badge flex-shrink-0">${idx + 1}</div>
-                        <div>
-                            <h6 class="fw-bold mb-1">${s.title}</h6>
-                            <p class="mb-0 text-muted small">${s.text}</p>
-                        </div>
-                    </div>
-                `).join('');
-            } else {
-                stepsHtml = '<p class="text-muted">No hay pasos registrados.</p>';
-            }
+            const modalBadge = document.getElementById('modalBadge');
+            modalBadge.innerText = item.type;
 
-            document.getElementById('modalBody').innerHTML = `
-                <div class="mb-3">
-                    <span class="badge ${item.type === 'PROVEEDOR' ? 'badge-provider' : 'badge-internal'} mb-2">${item.type}</span>
-                    <h5 class="fw-bold">${item.title}</h5>
-                </div>
-                <div class="alert alert-info py-2">
-                    <strong>Objetivo:</strong> ${item.objective || 'Sin objetivo especificado.'}
-                </div>
-                <h6 class="fw-bold mt-4 mb-3">Pasos del Procedimiento:</h6>
-                <div>${stepsHtml}</div>
-            `;
+            document.getElementById('modalFullContent').innerHTML = item.htmlContent || '<p>Sin contenido cargado.</p>';
+
+            const modalDownloadBtn = document.getElementById('modalDownloadBtn');
+            if (item.fileData) {
+                modalDownloadBtn.style.display = 'inline-block';
+                modalDownloadBtn.onclick = () => downloadOriginalWord(item.id);
+            } else {
+                modalDownloadBtn.style.display = 'none';
+            }
 
             const modal = new bootstrap.Modal(document.getElementById('viewModal'));
             modal.show();
         }
 
-        function deleteManual(id) {
-            if (confirm('¿Desea eliminar este manual?')) {
-                let data = getStoredData();
-                data = data.filter(m => m.id !== id);
-                saveData(data);
-                renderTables();
+        async function downloadOriginalWord(id) {
+            const data = await getAllManuals();
+            const item = data.find(m => m.id === id);
+            if (!item || !item.fileData) {
+                alert('Este documento no posee archivo Word adjunto.');
+                return;
+            }
+
+            const blob = new Blob([item.fileData], { type: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `${item.fileName || item.title + '.docx'}`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        }
+
+        async function processWordFiles(e) {
+            const files = Array.from(e.target.files);
+            if (!files.length) return;
+
+            const uploadType = document.querySelector('input[name="uploadType"]:checked').value;
+            let successCount = 0;
+
+            for (const file of files) {
+                try {
+                    const arrayBuffer = await file.arrayBuffer();
+                    const result = await mammoth.convertToHtml({ arrayBuffer: arrayBuffer });
+                    const cleanTitle = file.name.replace(/\.[^/.]+$/, "").toUpperCase();
+
+                    const newManual = {
+                        id: Date.now().toString() + Math.random().toString(36).substr(2, 5),
+                        type: uploadType,
+                        title: cleanTitle,
+                        htmlContent: result.value,
+                        fileData: arrayBuffer,
+                        fileName: file.name
+                    };
+
+                    await saveManual(newManual);
+                    successCount++;
+                } catch (err) {
+                    console.error("Error procesando " + file.name, err);
+                }
+            }
+
+            await renderAll();
+            e.target.value = '';
+
+            if (successCount > 0) {
+                alert(`¡Éxito! Se han importado y guardado ${successCount} documento(s) Word correctamente.`);
+            }
+
+            switchTab(uploadType === 'PROVEEDOR' ? 'vis-prov-tab' : 'vis-int-tab');
+        }
+
+        async function loadManualIntoEditor(type) {
+            const isProv = type === 'PROVEEDOR';
+            const selectId = isProv ? 'provSelectManual' : 'intSelectManual';
+            const titleInputId = isProv ? 'provTitleEdit' : 'intTitleEdit';
+            const editorId = isProv ? 'provEditor' : 'intEditor';
+
+            const selectedId = document.getElementById(selectId).value;
+            if (selectedId === 'NEW') {
+                document.getElementById(titleInputId).value = '';
+                document.getElementById(editorId).innerHTML = '';
+                return;
+            }
+
+            const data = await getAllManuals();
+            const item = data.find(m => m.id === selectedId);
+            if (item) {
+                document.getElementById(titleInputId).value = item.title;
+                document.getElementById(editorId).innerHTML = item.htmlContent;
+            }
+        }
+
+        async function openInEditor(id) {
+            const data = await getAllManuals();
+            const item = data.find(m => m.id === id);
+            if (!item) return;
+
+            if (item.type === 'PROVEEDOR') {
+                switchTab('mod-prov-tab');
+                document.getElementById('provSelectManual').value = item.id;
+                await loadManualIntoEditor('PROVEEDOR');
+            } else {
+                switchTab('mod-int-tab');
+                document.getElementById('intSelectManual').value = item.id;
+                await loadManualIntoEditor('INTERNO');
+            }
+        }
+
+        async function saveManualEditor(e, type) {
+            e.preventDefault();
+            const isProv = type === 'PROVEEDOR';
+            const selectId = isProv ? 'provSelectManual' : 'intSelectManual';
+            const titleInputId = isProv ? 'provTitleEdit' : 'intTitleEdit';
+            const editorId = isProv ? 'provEditor' : 'intEditor';
+
+            const selectedId = document.getElementById(selectId).value;
+            const title = document.getElementById(titleInputId).value.trim();
+            const htmlContent = document.getElementById(editorId).innerHTML;
+
+            if (!title) {
+                alert('Ingrese el nombre o razón social.');
+                return;
+            }
+
+            const data = await getAllManuals();
+            const existingItem = data.find(m => m.id === selectedId);
+
+            const newItem = {
+                id: selectedId === 'NEW' ? Date.now().toString() : selectedId,
+                type: type,
+                title: title,
+                htmlContent: htmlContent,
+                fileData: existingItem ? existingItem.fileData : null,
+                fileName: existingItem ? existingItem.fileName : null
+            };
+
+            await saveManual(newItem);
+            await renderAll();
+            alert('¡Manual guardado correctamente!');
+            switchTab(isProv ? 'vis-prov-tab' : 'vis-int-tab');
+        }
+
+        async function deleteManual(id) {
+            if (confirm('¿Está seguro de que desea eliminar este manual?')) {
+                await deleteManualFromDB(id);
+                await renderAll();
+            }
+        }
+
+        async function clearAllData() {
+            if (confirm('¿ATENCIÓN: Está seguro de que desea eliminar TODOS los manuales del sistema?')) {
+                await clearDB();
+                await renderAll();
             }
         }
 
         function filterManuals(type) {
-            const searchVal = document.getElementById(type === 'PROVEEDOR' ? 'searchProv' : 'searchInt').value.toLowerCase();
-            const rows = document.querySelectorAll(type === 'PROVEEDOR' ? '#tableProv tr' : '#tableInt tr');
+            const isProv = type === 'PROVEEDOR';
+            const inputId = isProv ? 'searchProvInput' : 'searchIntInput';
+            const tableId = isProv ? '#tableProv tr' : '#tableInt tr';
+            const query = document.getElementById(inputId).value.toLowerCase();
+
+            const rows = document.querySelectorAll(`${tableId}`);
             rows.forEach(row => {
-                const text = row.cells[1].innerText.toLowerCase();
-                row.style.display = text.includes(searchVal) ? '' : 'none';
+                const titleText = row.cells[1].innerText.toLowerCase();
+                row.style.display = titleText.includes(query) ? '' : 'none';
             });
+        }
+
+        function execCmd(command) {
+            document.execCommand(command, false, null);
+        }
+
+        function triggerEditorImageUpload(targetEditorId) {
+            document.getElementById('editorImgInput').click();
+        }
+
+        function insertImageIntoEditor(e) {
+            const file = e.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(event) {
+                const imgTag = `<img src="${event.target.result}" style="max-width:100%; border-radius:8px; margin:10px 0;">`;
+                document.execCommand('insertHTML', false, imgTag);
+            };
+            reader.readAsDataURL(file);
         }
 
         function switchTab(tabId) {
@@ -535,45 +846,17 @@
             }
         }
 
-        function handleFileUpload(e) {
-            const files = e.target.files;
-            if (!files.length) return;
-            const data = getStoredData();
-            Array.from(files).forEach((file, index) => {
-                const nameClean = file.name.replace('.docx', '').toUpperCase();
-                data.push({
-                    id: (Date.now() + index).toString(),
-                    type: 'PROVEEDOR',
-                    title: nameClean,
-                    status: 'Listo para visualizar',
-                    objective: `Manual cargado masivamente desde archivo ${file.name}`,
-                    steps: [
-                        { title: "Inicio de Proceso", text: "Procedimiento importado mediante carga masiva de documento Word." }
-                    ]
-                });
-            });
-            saveData(data);
-            renderTables();
-            alert('¡Carga masiva completada exitosamente!');
-            switchTab('vis-prov-tab');
+        function printModalContent() {
+            const content = document.getElementById('modalFullContent').innerHTML;
+            const title = document.getElementById('modalTitle').innerText;
+            const printWin = window.open('', '', 'width=900,height=700');
+            printWin.document.write(`<html><head><title>${title}</title><style>body{font-family:sans-serif;padding:20px;} img{max-width:100%;}</style></head><body><h2>${title}</h2><hr>${content}</body></html>`);
+            printWin.document.close();
+            printWin.print();
         }
 
-        function shareCurrentState() {
-            const data = getStoredData();
-            const encoded = btoa(JSON.stringify(data));
-            const shareUrl = `${window.location.origin}${window.location.pathname}?data=${encoded}`;
-            navigator.clipboard.writeText(shareUrl).then(() => {
-                alert('¡Enlace de la aplicación copiado al portapapeles!');
-            }).catch(() => {
-                alert('Enlace generado: ' + shareUrl);
-            });
-        }
-
-        // Initialize default step fields on page load
         document.addEventListener('DOMContentLoaded', () => {
-            initData();
-            addStepField('provStepsContainer');
-            addStepField('intStepsContainer');
+            renderAll();
         });
     </script>
 </body>
