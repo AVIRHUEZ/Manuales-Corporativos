@@ -572,6 +572,10 @@
             snapshot.forEach(doc => {
                 currentManuals.push({ id: doc.id, ...doc.data() });
             });
+            
+            // ORDENAR ALFABÉTICAMENTE DE LA A A LA Z
+            currentManuals.sort((a, b) => (a.title || '').localeCompare(b.title || ''));
+
             renderAll();
         }, error => {
             console.error("Error al sincronizar datos:", error);
