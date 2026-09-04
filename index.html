@@ -544,7 +544,6 @@
 
                 if (error) throw error;
 
-                // Mapeo de nombres de columnas Supabase -> Interfaz JavaScript
                 return (data || []).map(item => ({
                     id: item.id,
                     type: item.type,
@@ -560,24 +559,23 @@
         }
 
         async function saveManual(item) {
-            try {
-                const dbRecord = {
-                    id: item.id,
-                    type: item.type,
-                    title: item.title,
-                    html_content: item.htmlContent,
-                    file_name: item.fileName,
-                    file_data: item.fileData
-                };
+            const dbRecord = {
+                id: item.id,
+                type: item.type,
+                title: item.title,
+                html_content: item.htmlContent,
+                file_name: item.fileName,
+                file_data: item.fileData
+            };
 
-                const { error } = await supabaseClient
-                    .from('manuals')
-                    .upsert([dbRecord]);
+            const { error } = await supabaseClient
+                .from('manuals')
+                .upsert([dbRecord]);
 
-                if (error) throw error;
-            } catch (err) {
-                console.error("Error al guardar en Supabase:", err);
-                throw err;
+            if (error) {
+                console.error("Error de Supabase:", error);
+                alert("Error al guardar en Supabase: " + error.message);
+                throw error;
             }
         }
 
@@ -591,6 +589,7 @@
                 if (error) throw error;
             } catch (err) {
                 console.error("Error al eliminar de Supabase:", err);
+                alert("Error al eliminar registro: " + err.message);
                 throw err;
             }
         }
@@ -614,6 +613,7 @@
                 }
             } catch (err) {
                 console.error("Error al vaciar Supabase:", err);
+                alert("Error al vaciar la base de datos: " + err.message);
                 throw err;
             }
         }
@@ -764,7 +764,6 @@
                     await saveManual(newManual);
                 } catch (err) {
                     console.error("Error procesando " + file.name, err);
-                    alert("Ocurrió un error al cargar el archivo " + file.name);
                 }
             }
 
