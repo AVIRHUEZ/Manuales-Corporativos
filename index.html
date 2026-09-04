@@ -12,7 +12,6 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.6.0/mammoth.browser.min.js"></script>
     <!-- Supabase JS Client -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-
     <style>
         :root {
             --header-blue: #0d47a1;
@@ -245,6 +244,7 @@
             color: white;
         }
 
+        /* AJUSTES PARA EL VISUALIZADOR (MODAL) */
         #modalFullContent {
             overflow-x: auto;
             word-wrap: break-word;
@@ -335,6 +335,7 @@
             
             <div class="tab-pane fade show active" id="vis-prov" role="tabpanel">
                 <div class="section-title">Seleccione la Orden o Razón Social que desea consultar:</div>
+                
                 <div class="content-card">
                     <div class="row align-items-end mb-3 g-2">
                         <div class="col-md-5">
@@ -343,7 +344,7 @@
                             <datalist id="provOptions"></datalist>
                         </div>
                         <div class="col-md-3">
-                            <span id="provCountBadge" class="badge-count"><i class="fa-solid fa-magnifying-glass me-1"></i>Cargando registros...</span>
+                            <span id="provCountBadge" class="badge-count"><i class="fa-solid fa-magnifying-glass me-1"></i>Buscando registros...</span>
                         </div>
                     </div>
 
@@ -465,7 +466,7 @@
                 <div class="content-card text-center py-5">
                     <i class="fa-solid fa-file-arrow-up fa-3x text-muted mb-3"></i>
                     <h6>Importador de Documentos Word</h6>
-                    <p class="text-muted small mb-4">Seleccione la categoría e importe sus archivos Word directamente a la aplicación en la nube.</p>
+                    <p class="text-muted small mb-4">Seleccione la categoría e importe sus archivos Word directamente a la aplicación.</p>
 
                     <div class="d-flex justify-content-center gap-4 mb-4">
                         <label class="form-check-label"><input type="radio" name="uploadType" value="PROVEEDOR" checked> Manual Proveedores</label>
@@ -557,7 +558,7 @@
         async function getAllManuals() {
             const { data, error } = await supabase.from('manuals').select('*');
             if (error) {
-                console.error("Error cargando de la nube:", error);
+                console.error("Error cargando de Supabase:", error);
                 return [];
             }
             return data.map(m => ({
@@ -579,12 +580,12 @@
                 file_name: item.fileName,
                 file_data: item.fileData ? arrayBufferToBase64(item.fileData) : null
             });
-            if (error) console.error("Error guardando:", error);
+            if (error) console.error("Error guardando en Supabase:", error);
         }
 
         async function deleteManualFromDB(id) {
             const { error } = await supabase.from('manuals').delete().eq('id', id);
-            if (error) console.error("Error eliminando:", error);
+            if (error) console.error("Error eliminando de Supabase:", error);
         }
 
         async function clearDB() {
