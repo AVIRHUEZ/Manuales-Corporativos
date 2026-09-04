@@ -8,8 +8,8 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <!-- Font Awesome Pro icons -->
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
-    <!-- Mammoth JS para convertir .docx en HTML -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.6.0/mammoth.browser.min.js"></script>
+    <!-- JSZip para descompresión nativa de archivos Word .docx -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
     <!-- Supabase JS Client -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
@@ -244,7 +244,6 @@
             color: white;
         }
 
-        /* AJUSTES PARA EL VISUALIZADOR (MODAL) */
         #modalFullContent {
             overflow-x: auto;
             word-wrap: break-word;
@@ -265,6 +264,18 @@
             word-break: break-word;
         }
 
+        #loadingOverlay {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 9999;
+            color: #fff;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+
         ::-webkit-scrollbar {
             width: 6px;
             height: 6px;
@@ -278,6 +289,12 @@
     </style>
 </head>
 <body>
+
+    <!-- Overlay de Carga -->
+    <div id="loadingOverlay">
+        <div class="spinner-border text-light mb-2" role="status"></div>
+        <div id="loadingText" class="fw-bold">Procesando y guardando documentos...</div>
+    </div>
 
     <div class="top-bar-blue d-flex justify-content-between align-items-center">
         <div class="d-flex align-items-center gap-2">
@@ -517,9 +534,6 @@
                     <div id="modalFullContent" style="font-size: 13px; line-height: 1.5;"></div>
                 </div>
                 <div class="modal-footer py-2" style="background-color: var(--bg-table-header);">
-                    <button type="button" id="modalDownloadBtn" class="btn-portalsn-blue">
-                        <i class="fa-solid fa-file-word me-1"></i>Descargar Word
-                    </button>
                     <button type="button" class="btn-portalsn-gray" onclick="printModalContent()"><i class="fa-solid fa-print me-1"></i>Imprimir</button>
                     <button type="button" class="btn-portalsn-gray" data-bs-dismiss="modal">Cerrar</button>
                 </div>
@@ -530,10 +544,19 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
     <script>
-        // Configuración de conexión con Supabase en la nube
+        // Configuración de Supabase
         const SUPABASE_URL = 'https://cufshbjqyoqdtxjyisoi.supabase.co';
         const SUPABASE_KEY = 'sb_publishable_gok_tEHpZc32_xgeAG-tKQ_qzsGKUdm';
         const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+        function showLoading(msg) {
+            document.getElementById('loadingText').innerText = msg || "Procesando...";
+            document.getElementById('loadingOverlay').style.display = 'flex';
+        }
+
+        function hideLoading() {
+            document.getElementById('loadingOverlay').style.display = 'none';
+        }
 
         async function getAllManuals() {
             try {
@@ -549,8 +572,7 @@
                     type: item.type,
                     title: item.title,
                     htmlContent: item.html_content,
-                    fileName: item.file_name,
-                    fileData: item.file_data
+                    fileName: item.file_name
                 }));
             } catch (err) {
                 console.error("Error al obtener manuales de Supabase:", err);
@@ -564,8 +586,7 @@
                 type: item.type,
                 title: item.title,
                 html_content: item.htmlContent,
-                file_name: item.fileName,
-                file_data: item.fileData
+                file_name: item.fileName
             };
 
             const { error } = await supabaseClient
@@ -574,7 +595,7 @@
 
             if (error) {
                 console.error("Error de Supabase:", error);
-                alert("Error al guardar en Supabase: " + error.message);
+                alert("Error de permisos o base de datos en Supabase: " + error.message);
                 throw error;
             }
         }
@@ -646,12 +667,6 @@
                 const isProv = item.type === 'PROVEEDOR';
                 if (isProv) provCount++;
 
-                const hasFile = !!item.fileData;
-                const downloadBtnHtml = hasFile ? 
-                    `<button class="btn-portalsn-gray py-0 px-2 me-1" title="Descargar Word" onclick="downloadOriginalWord('${item.id}')">
-                        <i class="fa-solid fa-file-word text-primary"></i>
-                     </button>` : '';
-
                 const rowHtml = `
                     <tr>
                         <td><b>${item.type}</b></td>
@@ -661,7 +676,6 @@
                             <button class="btn-portalsn-gray py-0 px-2 me-1" onclick="viewFullManual('${item.id}')">
                                 <i class="fa-solid fa-eye me-1"></i>Ver
                             </button>
-                            ${downloadBtnHtml}
                             <button class="btn-portalsn-gray py-0 px-2 me-1" onclick="openInEditor('${item.id}')">
                                 <i class="fa-solid fa-pen"></i>
                             </button>
@@ -695,81 +709,73 @@
             document.getElementById('modalTitle').innerText = item.title + " (" + item.type + ")";
             document.getElementById('modalFullContent').innerHTML = item.htmlContent || '<p>Sin contenido.</p>';
 
-            const modalDownloadBtn = document.getElementById('modalDownloadBtn');
-            if (item.fileData) {
-                modalDownloadBtn.style.display = 'inline-block';
-                modalDownloadBtn.onclick = () => downloadOriginalWord(item.id);
-            } else {
-                modalDownloadBtn.style.display = 'none';
-            }
-
             const modal = new bootstrap.Modal(document.getElementById('viewModal'));
             modal.show();
         }
 
-        async function downloadOriginalWord(id) {
-            const data = await getAllManuals();
-            const item = data.find(m => m.id === id);
-            if (!item || !item.fileData) return;
-
-            const a = document.createElement('a');
-            a.href = item.fileData;
-            a.download = `${item.fileName || item.title + '.docx'}`;
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
-        }
-
-        function readFileAsDataURL(file) {
-            return new Promise((resolve, reject) => {
-                const reader = new FileReader();
-                reader.onload = () => resolve(reader.result);
-                reader.onerror = reject;
-                reader.readAsDataURL(file);
-            });
-        }
-
-        function readFileAsArrayBuffer(file) {
-            return new Promise((resolve, reject) => {
-                const reader = new FileReader();
-                reader.onload = () => resolve(reader.result);
-                reader.onerror = reject;
-                reader.readAsArrayBuffer(file);
-            });
+        // Extractor de texto .docx 100% nativo mediante JSZip (no depende de librerías externas vulnerables)
+        async function extractDocxHtml(file) {
+            try {
+                const zip = new JSZip();
+                const loadedZip = await zip.loadAsync(file);
+                const xmlFile = loadedZip.file("word/document.xml");
+                if (!xmlFile) throw new Error("Archivo .docx inválido");
+                
+                const xmlText = await xmlFile.async("text");
+                const parser = new DOMParser();
+                const xmlDoc = parser.parseFromString(xmlText, "text/xml");
+                const paragraphs = xmlDoc.getElementsByTagName("w:p");
+                
+                let htmlResult = "";
+                for (let i = 0; i < paragraphs.length; i++) {
+                    let pText = paragraphs[i].textContent;
+                    if (pText && pText.trim().length > 0) {
+                        htmlResult += `<p>${pText.trim()}</p>`;
+                    }
+                }
+                return htmlResult || "<p>Documento importado sin texto legible.</p>";
+            } catch (e) {
+                console.error("Error al extraer docx:", e);
+                return `<p>Contenido importado de ${file.name}</p>`;
+            }
         }
 
         async function processWordFiles(e) {
             const files = Array.from(e.target.files);
             if (!files.length) return;
 
+            showLoading(`Procesando ${files.length} archivo(s)...`);
             const uploadType = document.querySelector('input[name="uploadType"]:checked').value;
+            let successCount = 0;
 
             for (const file of files) {
                 try {
-                    const arrayBuffer = await readFileAsArrayBuffer(file);
-                    const dataUrl = await readFileAsDataURL(file);
-                    
-                    const result = await mammoth.convertToHtml({ arrayBuffer: arrayBuffer });
+                    const extractedHtml = await extractDocxHtml(file);
                     const cleanTitle = file.name.replace(/\.[^/.]+$/, "").toUpperCase();
 
                     const newManual = {
                         id: Date.now().toString() + Math.random().toString(36).substr(2, 5),
                         type: uploadType,
                         title: cleanTitle,
-                        htmlContent: result.value,
-                        fileData: dataUrl,
+                        htmlContent: extractedHtml,
                         fileName: file.name
                     };
 
                     await saveManual(newManual);
+                    successCount++;
                 } catch (err) {
                     console.error("Error procesando " + file.name, err);
                 }
             }
 
             await renderAll();
+            hideLoading();
             e.target.value = '';
-            switchTab(uploadType === 'PROVEEDOR' ? 'vis-prov-tab' : 'vis-int-tab');
+
+            if (successCount > 0) {
+                alert(`¡Se cargaron exitosamente ${successCount} documento(s)!`);
+                switchTab(uploadType === 'PROVEEDOR' ? 'vis-prov-tab' : 'vis-int-tab');
+            }
         }
 
         async function loadManualIntoEditor(type) {
@@ -823,31 +829,38 @@
             const data = await getAllManuals();
             const existingItem = data.find(m => m.id === selectedId);
 
+            showLoading("Guardando registro...");
+
             const newItem = {
                 id: selectedId === 'NEW' ? Date.now().toString() : selectedId,
                 type: type,
                 title: title,
                 htmlContent: htmlContent,
-                fileData: existingItem ? existingItem.fileData : null,
                 fileName: existingItem ? existingItem.fileName : null
             };
 
             await saveManual(newItem);
             await renderAll();
+            hideLoading();
+            alert("Registro guardado con éxito.");
             switchTab(isProv ? 'vis-prov-tab' : 'vis-int-tab');
         }
 
         async function deleteManual(id) {
             if (confirm('¿Desea eliminar este registro?')) {
+                showLoading("Eliminando...");
                 await deleteManualFromDB(id);
                 await renderAll();
+                hideLoading();
             }
         }
 
         async function clearAllData() {
             if (confirm('¿Desea vaciar toda la base de datos de manuales?')) {
+                showLoading("Vaciando base de datos...");
                 await clearDB();
                 await renderAll();
+                hideLoading();
             }
         }
 
